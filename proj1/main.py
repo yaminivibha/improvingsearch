@@ -7,6 +7,8 @@ import sys
 
 from googleapiclient.discovery import build
 
+def parse_res(res):
+	pass
 
 def main():
 	# Build a service object for interacting with the API. Visit
@@ -23,6 +25,14 @@ def main():
 	desired_precision = sys.argv[3]
 	query = sys.argv[4]
 
+	print("Parameters: ")
+	print("Client key  = " + str(dev_key))
+	print("Engine key  = " + str(search_engine_id))
+	print("Query       = " + str(query))
+	print("Precision   = " + str(desired_precision))
+	print("Google Search Results: ")
+	print("======================")
+
 	service = build(
 		"customsearch", "v1", developerKey=dev_key
 	)
@@ -36,6 +46,7 @@ def main():
 		.execute()
 	)
 	pprint.pprint(res)
+
 
 
 if __name__ == "__main__":
