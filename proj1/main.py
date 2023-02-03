@@ -8,14 +8,24 @@ import sys
 from googleapiclient.discovery import build
 
 def parse_res(res):
-	pass
+	"""
+	Returns the URL, Title, Summary of a Google Custom Search API Result
+	"""
+
+	parsed_res = ["URL: " + res["formattedUrl"],
+			 "Title: " + res["title"],
+			"Summary: " + res["snippet"]]
+
+	return parsed_res
+
+
 
 def main():
 	# Build a service object for interacting with the API. Visit
 	# the Google APIs Console <http://code.google.com/apis/console>
 	# to get an API key for your own application.
 
-	# Q: what's the behavior when not the correct number of args?
+	# !!! is invoking the program with python3 xx.py ok? or how do you get it to run with the ./run thing?
 	if len(sys.argv) != 5:
 		print("Usage: python3 main.py <google api key> <google engine id> <precision> <query>")
 		sys.exit(-1)
@@ -45,7 +55,13 @@ def main():
 	)
 		.execute()
 	)
-	pprint.pprint(res)
+	
+	top10_res = res["items"][0:11]
+	for i, res in enumerate(top10_res):
+		print("Result " + str(i + 1))
+		pprint.pprint(parse_res(res))
+	# pprint.pprint(top10_res)
+	
 
 
 
