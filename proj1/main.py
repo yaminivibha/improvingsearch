@@ -4,19 +4,7 @@
 
 import pprint
 import sys
-
-from googleapiclient.discovery import build
-
-def parse_res(res):
-	"""
-	Returns the URL, Title, Summary of a Google Custom Search API Result
-	"""
-	
-	parsed_res = [" URL: " + res["formattedUrl"],
-			 "Title: " + res["title"],
-			"Summary: " + res["snippet"]]
-
-	return parsed_res
+import utils
 
 def main():
 	# Build a service object for interacting with the API. Visit
@@ -33,39 +21,9 @@ def main():
 	desired_precision = sys.argv[3]
 	query = sys.argv[4]
 
-	print("Parameters: ")
-	print("Client key  = " + str(dev_key))
-	print("Engine key  = " + str(search_engine_id))
-	print("Query       = " + str(query))
-	print("Precision   = " + str(desired_precision))
-	print("Google Search Results: ")
-	print("======================")
+	res = utils.executeQuery(dev_key, search_engine_id, query, desired_precision)
 
-	service = build(
-		"customsearch", "v1", developerKey=dev_key
-	)
-
-	full_res = (
-		service.cse()
-		.list(
-			q=query,
-			cx=search_engine_id,
-	)
-		.execute()
-	)
-	
-	top10_res = full_res["items"][0:11]
-	for i, res in enumerate(top10_res):
-		print("Result " + str(i + 1))
-		print("[")
-		print("\n ".join(parse_res(res)))
-		print("]\n")
-
-		user_relevance = input("Relevant (Y/N)?")
-		# TODO: input checking lol
-
-	# pprint.pprint(top10_res)
-
+	relevant_docs = utils.getRelevanceFeedback(res)
 	
 	
 
