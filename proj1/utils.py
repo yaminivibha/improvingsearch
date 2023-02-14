@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 def removeStopwords(stopword_file):
 	pass
 
-def executeQuery(dev_key, search_engine_id, query, desired_precision):
+def getQueryResult(dev_key, search_engine_id, query, desired_precision):
 	print("Parameters: ")
 	print("Client key  = " + str(dev_key))
 	print("Engine key  = " + str(search_engine_id))
@@ -29,6 +29,8 @@ def executeQuery(dev_key, search_engine_id, query, desired_precision):
 		.execute()
 	)
 
+	# TODO: skip non-html files
+	# may have to return the entire result from this fn?
 	return full_res["items"][0:11]
 
 def parseResults(res):
@@ -44,11 +46,15 @@ def parseResults(res):
 
 def getRelevanceFeedback(top10_res):
 	"""
-	Returns relevant docs as marked by the user
+	Returns corpus (dict) with relevance information as marked by the user
+
+	Return format:
+	{docid: {Summary: " ", "Relevant": 1}, ....}
 	"""
 	relevant_docs = []
 
 	for i, res in enumerate(top10_res):
+		# TODO: use full body text instead of summary?
 		print("Result " + str(i + 1))
 		print("[")
 		print("\n ".join(parseResults(res)))

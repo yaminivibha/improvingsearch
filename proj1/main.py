@@ -21,12 +21,11 @@ def main():
 	desired_precision = sys.argv[3]
 	query = sys.argv[4]
 
-	res = utils.executeQuery(dev_key, search_engine_id, query, desired_precision)
-
-	relevant_docs = utils.getRelevanceFeedback(res)
+	cur_precision = INT_MIN
 	
-	
-
+	while cur_precision < desired_precision:
+		res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision)
+		relevant_docs = utils.getRelevanceFeedback(res)
 
 
 if __name__ == "__main__":
