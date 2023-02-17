@@ -3,18 +3,21 @@ Implements Rocchio's algorithm
 """
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nlp_utils import preprocess
+import pandas as pd
 
 class ExpandedQuery:
         def __init__(self, query, precision, relevant_docs, irrelevant_docs):
                 """
                 TODO: explain instance vars
                 """
+                self.query = query
                 self.precision = precision
                 self.relcount = len(relevant_docs)
                 self.irrelcount = len(irrelevant_docs)
+                self.docs = relevant_docs + irrelevant_docs
                 self.relevant_docs = relevant_docs
                 self.irrelevant_docs = irrelevant_docs
-                self.computeTfidfs(query, self.relevant_docs, self.irrelevant_docs) # make less jank
+                self.computeTfIdfs() # make less jank
 
         def computeTfIdfs(self):
                 """
@@ -22,12 +25,18 @@ class ExpandedQuery:
                 and irrelevant docs
                 """
                 tfidf = TfidfVectorizer()
-                self.query_tfidf = tfidf.fit_transform(query)
-                self.relevant_tfidf = tfidf.fit_transform(self.relevant_docs)
-                self.irrelevant_tfidf = tfidf.fit_transform(self.irrelevant_docs)
+                vocab = tfidf.fit(self.docs).vocabulary_
 
-                # print(f"relevant tfidf: {self.relevant_tfidf}")
-                # print(f"irrelevant tfidf: {self.irrelevant_tfidf}")
+                #print(f"vocab type: {type(vocab)}")
+                tfidf_fixedvocab = TfidfVectorizer(vocabulary=vocab)
+
+                self.query_tfidf = tfidf_fixedvocab.fit_transform([self.query])
+                self.relevant_tfidf = tfidf_fixedvocab.fit_transform(self.relevant_docs)
+                self.irrelevant_tfidf = tfidf_fixedvocab.fit_transform(self.irrelevant_docs)
+                
+                print(f"query tfidf: {self.query_tfidf}")
+                print(f"relevant tfidf: {self.relevant_tfidf}")
+                print(f"irrelevant tfidf: {self.irrelevant_tfidf}")
                 return
         
         def getRocchioScore(self):
@@ -39,10 +48,8 @@ class ExpandedQuery:
                 beta = 0.7
                 gamma = 0.15
 
-                score = alpha * q_0 + beta * \
-                        relevant_docs + gamma * \
-                        irrelevant_docs
-        
+                #score = alpha * self.query_tfidf + beta * self.relevant_tfidf - gamma * self.irrelevant_tfidf
+                #print(f"Rocchio score: {score}")
                 return score
         
         def getQueryVector():
