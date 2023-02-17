@@ -55,6 +55,8 @@ def main():
 	)
 	
 	top10_res = full_res["items"][0:11]
+	precision_num = 0
+	
 	for i, res in enumerate(top10_res):
 		print("Result " + str(i + 1))
 		print("[")
@@ -62,14 +64,17 @@ def main():
 		print("]\n")
 
 		user_relevance = input("Relevant (Y/N)?")
+		if user_relevance == "Y" or user_relevance == "y":
+			precision_num += 1
+
+		
 		# TODO: input checking lol
 
 	# pprint.pprint(top10_res)
-
-	
-	
-
-
+	print("================")
+	print("FEEDBACK SUMMARY")
+	print(f"Query '{query}'")
+	print("Precision: " + str(precision_num/10))
 
 if __name__ == "__main__":
 	main()
