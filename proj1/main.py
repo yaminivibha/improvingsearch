@@ -5,6 +5,7 @@
 import pprint
 import sys
 import utils
+from expandedQuery import *
 
 
 def main():
@@ -28,7 +29,9 @@ def main():
 
     while cur_precision < desired_precision:
         res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision)
-        relevant_docs = utils.getRelevanceFeedback(res)
+        relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
+        expanded_query = ExpandedQuery(query, cur_precision, relevant_docs, irrelevant_docs)
+        expanded_query.computeTfIdf()
 
 
 if __name__ == "__main__":
