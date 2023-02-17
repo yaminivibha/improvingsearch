@@ -2,17 +2,15 @@
 Implements Rocchio's algorithm
 """
 from sklearn.feature_extraction.text import TfidfVectorizer
-
+from nlp_utils import preprocess
 
 class expandedQuery:
 	def __init__(self, query, precision, relevant_docs, irrelevant_docs):
 		self.precision = precision
-		self.relevant_docs = []
-		self.irrelevant_docs = []
-		self.relcount = 0
-		self.irrelcount = 0
-		pass
-		
+		self.relevant_docs = relevant_docs
+		self.irrelevant_docs = irrelevant_docs
+		self.relcount = len(relevant_docs)
+		self.irrelcount = len(irrelevant_docs)
 
 	def computeTfIdf(self):
 		tfidf = TfidfVectorizer()

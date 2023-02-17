@@ -2,7 +2,7 @@
 Helper functions related to query execution, response handling, and input processing
 """
 from googleapiclient.discovery import build
-
+from nlp_utils import preprocess
 
 def getQueryResult(dev_key, search_engine_id, query, desired_precision):
     """Get the top 10 results for a given query from Google Custom Search API"""
@@ -67,7 +67,9 @@ def getRelevanceFeedback(top10_res):
         else:
             irrelevant_docs.append(combineResults(res))
 
-    # print(f"Relevant docs: {relevant_docs}")
+    print(f"Relevant docs:\n {relevant_docs}")
+    print(f"====================")
+    print(f"Relevant docs, Processed:\n {preprocess(relevant_docs)}")
     # print(f"Irrelevant docs: {irrelevant_docs}")
     return relevant_docs, irrelevant_docs
 
