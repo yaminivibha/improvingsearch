@@ -3,12 +3,10 @@ Helper functions related to query execution, response handling, and input proces
 """
 from googleapiclient.discovery import build
 
-# TODO: Stopword elimination pre-processing
-def removeStopwords(stopword_file):
-	pass
-
 def getQueryResult(dev_key, search_engine_id, query, desired_precision):
-	print("Parameters: ")
+	"""Get the top 10 results for a given query from Google Custom Search API"""
+    
+    print("Parameters: ")
 	print("Client key  = " + str(dev_key))
 	print("Engine key  = " + str(search_engine_id))
 	print("Query       = " + str(query))
@@ -44,14 +42,21 @@ def parseResults(res):
 
 	return parsed_res
 
+def combineResults(res):
+    #TODO: Parse URL (to get whats between the / / after the .com)
+    url = res["FormattedUrl"] 
+
+    return res["Title"] + res["Summary"]
+
+
 def getRelevanceFeedback(top10_res):
 	"""
 	Returns corpus (dict) with relevance information as marked by the user
-
 	Return format:
 	{docid: {Summary: " ", "Relevant": 1}, ....}
 	"""
 	relevant_docs = []
+    irrelevant_docs = []
 
 	for i, res in enumerate(top10_res):
 		# TODO: use full body text instead of summary?
@@ -63,11 +68,11 @@ def getRelevanceFeedback(top10_res):
 		# TODO: more robust input checking; reprompt if invalid input
 		user_relevance = input("Relevant (Y/N)?")
 		if user_relevance == "Y" or user_relevance == "y":
-			relevant_docs.append(res)
+			relevant_docs.append(combineResults(res))
+        else:
+            irrelevant_docs.append(combineResults(res))
 	
-	return relevant_docs
-	
-
+	return relevant_docs, irrelevant_docs
 
 def printFeedback(query, target_precision, cur_precision):
 	"""
