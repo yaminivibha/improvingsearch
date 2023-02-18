@@ -10,7 +10,7 @@ class ExpandedQuery:
     def __init__(self, query, precision, relevant_docs, irrelevant_docs):
         """
         TODO: explain instance vars
-        query = list of the current query terms
+        query = String containing current query terms
         precision = fraction of retrieved docs that are relevant to the query
         """
         self.query = query
@@ -19,6 +19,7 @@ class ExpandedQuery:
         self.relevant_docs = relevant_docs
         self.irrelevant_docs = irrelevant_docs
         self.computeTfIdfs()
+        self.getRocchioScore()
 
     def computeTfIdfs(self):
         """
@@ -45,16 +46,6 @@ class ExpandedQuery:
         print(f"irrelevant tfidf: {self.irrelevant_tfidf}")
         print(f"irrelevant tfidf shape: {self.irrelevant_tfidf.shape}")
         return
-
-    def computePrecision(self):
-        """
-        Computes the precision of the web search results using
-        the formula below:
-
-        precision = |relevant docs that are retrieved| / |retrieved docs|
-        """
-        # TODO: maybe not hardcode in 10 bc style ick but it's literally fine
-        return len(relevant_docs) / 10
 
     def getRocchioScore(self):
         """
@@ -100,4 +91,4 @@ class ExpandedQuery:
             if added_word_ct == 2:
                 break
         # print(f"added words: {added_words}")
-        return added_words
+        return (' '.join(added_words), ' '.join(added_words) + " " + self.query)

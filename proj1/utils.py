@@ -4,9 +4,9 @@ Helper functions related to query execution, response handling, and input proces
 from googleapiclient.discovery import build
 from nlp_utils import preprocess
 
-
 def getQueryResult(dev_key, search_engine_id, query, desired_precision):
     """Get the top 10 results for a given query from Google Custom Search API"""
+    # TODO: separate these prints from the actual sending of query
     print("Parameters:")
     print("Client key  = " + str(dev_key))
     print("Engine key  = " + str(search_engine_id))
@@ -14,7 +14,7 @@ def getQueryResult(dev_key, search_engine_id, query, desired_precision):
     print("Precision   = " + str(desired_precision))
     print("Google Search Results: ")
     print("======================")
-
+    # TODO: build class for QueryExecutor so service is an instance variable
     service = build("customsearch", "v1", developerKey=dev_key)
 
     full_res = service.cse().list(q=query, cx=search_engine_id,).execute()
@@ -75,14 +75,29 @@ def getRelevanceFeedback(top10_res):
     return relevant_docs, irrelevant_docs
 
 
-def printFeedback(query, target_precision, cur_precision):
+def printFeedback(query, expanded_terms, target_precision, cur_precision):
     """
     Returns query feedback summary to user
     """
-    print("Query: " + query)
-    print("Precision: " + cur_precision)
+    print("======================")
+    print("FEEDBACK SUMMARY")
+    print(f"Query: {query}")
+    print(f"Precision: {cur_precision}")
     if cur_precision < target_precision:
-        print("Still below the desired precision of " + target_precision)
+        print(f"Still below the desired precision of {target_precision}")
+        print("Indexing results ....")
+        print("Indexing results ....")
+        print(f"Augmenting by {expanded_terms}")
     else:
         print("Desired precision reached, done")
     return
+
+def computePrecision(num_rel):
+    """
+    Computes the precision of the web search results using
+    the formula below:
+    
+    precision = |relevant docs that are retrieved| / |retrieved docs|
+    """
+    # TODO: maybe not hardcode in 10 bc style ick but it's literally fine
+    return num_rel / 10

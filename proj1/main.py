@@ -27,19 +27,30 @@ def main():
     cur_precision = -1
 
     # run first iteration to get the current precision:
-    
-    while cur_precision < desired_precision:
+
+    while True:
         if cur_precision == 0:
             print("Precision of 0. Terminating...")
             break
 
         res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision)
         relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
+        cur_precision = utils.computePrecision(len(relevant_docs))
+        
+        # check termination
+        if cur_precision >= desired_precision:
+                utils.printFeedback(query, "", desired_precision, cur_precision)
+                break
+        # terminate if less than 10 docs
+
         expanded_query = ExpandedQuery(
             query, cur_precision, relevant_docs, irrelevant_docs
         )
-        expanded_query.getRocchioScore()
-        expanded_query.getModifiedQueryVector()
+        added_terms, query = expanded_query.getModifiedQueryVector()
+        print(f"expanded query: {query}")
+        # TODO: fix inconsistent naming (desired vs target)
+        utils.printFeedback(query, added_terms, desired_precision, cur_precision)
+
 
 
 if __name__ == "__main__":
