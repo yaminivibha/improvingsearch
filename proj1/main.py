@@ -36,6 +36,7 @@ def main():
         relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
         expanded_query = ExpandedQuery(query, cur_precision, relevant_docs, irrelevant_docs)
         expanded_query.getRocchioScore()
+        expanded_query.getModifiedQueryVector()
 
 if __name__ == "__main__":
     main()
