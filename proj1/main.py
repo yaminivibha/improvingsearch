@@ -13,7 +13,6 @@ def main():
     # the Google APIs Console <http://code.google.com/apis/console>
     # to get an API key for your own application.
 
-    # !!! is invoking the program with python3 xx.py ok? or how do you get it to run with the ./run thing?
     if len(sys.argv) != 5:
         print(
             "Usage: python3 main.py <google api key> <google engine id> <precision> <query>"
@@ -27,6 +26,8 @@ def main():
 
     cur_precision = -1
 
+    # run first iteration to get the current precision:
+    
     while cur_precision < desired_precision:
         if cur_precision == 0:
             print("Precision of 0. Terminating...")

@@ -9,20 +9,22 @@ import numpy as np
 class ExpandedQuery:
     def __init__(self, query, precision, relevant_docs, irrelevant_docs):
         """
-                TODO: explain instance vars
-                """
+        TODO: explain instance vars
+        query = list of the current query terms
+        precision = fraction of retrieved docs that are relevant to the query
+        """
         self.query = query
         self.precision = precision
         self.docs = relevant_docs + irrelevant_docs
         self.relevant_docs = relevant_docs
         self.irrelevant_docs = irrelevant_docs
-        self.computeTfIdfs()  # make less jank
+        self.computeTfIdfs()
 
     def computeTfIdfs(self):
         """
-                Computes the tfidf vectors for the query, relevant docs,
-                and irrelevant docs
-                """
+        Computes the tfidf vectors for the query, relevant docs,
+        and irrelevant docs
+        """
         tfidf = TfidfVectorizer()
         self.vocab = tfidf.fit(self.docs).vocabulary_
 
@@ -44,10 +46,20 @@ class ExpandedQuery:
         print(f"irrelevant tfidf shape: {self.irrelevant_tfidf.shape}")
         return
 
+    def computePrecision(self):
+        """
+        Computes the precision of the web search results using
+        the formula below:
+
+        precision = |relevant docs that are retrieved| / |retrieved docs|
+        """
+        # TODO: maybe not hardcode in 10 bc style ick but it's literally fine
+        return len(relevant_docs) / 10
+
     def getRocchioScore(self):
         """
-                Calculates the Rocchio score of a given query over the set of retrieved documents
-                """
+        Calculates the Rocchio score of a given query over the set of retrieved documents
+        """
         # constants set empirically
         alpha = 1
         beta = 0.7
@@ -64,14 +76,14 @@ class ExpandedQuery:
 
     def computeBigrams(self):
         """
-                Computes the bigrams of the document vectors
-                """
+        Computes the bigrams of the document vectors
+        """
         pass
 
     def getModifiedQueryVector(self):
         """
-                Returns the modified query vector with additional terms
-                """
+        Returns the modified query vector with additional terms
+        """
 
         # TODO: literally just need to be able to get the top n terms
         # as chosen by rocchio and get the words from the vocab
