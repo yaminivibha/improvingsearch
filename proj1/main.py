@@ -31,12 +31,15 @@ def main():
         if cur_precision == 0:
             print("Precision of 0. Terminating...")
             break
-        
+
         res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision)
         relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
-        expanded_query = ExpandedQuery(query, cur_precision, relevant_docs, irrelevant_docs)
+        expanded_query = ExpandedQuery(
+            query, cur_precision, relevant_docs, irrelevant_docs
+        )
         expanded_query.getRocchioScore()
         expanded_query.getModifiedQueryVector()
+
 
 if __name__ == "__main__":
     main()

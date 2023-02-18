@@ -4,6 +4,7 @@ Helper functions related to query execution, response handling, and input proces
 from googleapiclient.discovery import build
 from nlp_utils import preprocess
 
+
 def getQueryResult(dev_key, search_engine_id, query, desired_precision):
     """Get the top 10 results for a given query from Google Custom Search API"""
     print("Parameters:")
