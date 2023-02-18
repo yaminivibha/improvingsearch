@@ -4,72 +4,43 @@
 
 import pprint
 import sys
+import utils
+from expandedQuery import *
 
-from googleapiclient.discovery import build
-
-def parse_res(res):
-	"""
-	Returns the URL, Title, Summary of a Google Custom Search API Result
-	"""
-	
-	parsed_res = [" URL: " + res["formattedUrl"],
-			 "Title: " + res["title"],
-			"Summary: " + res["snippet"]]
-
-	return parsed_res
 
 def main():
-	# Build a service object for interacting with the API. Visit
-	# the Google APIs Console <http://code.google.com/apis/console>
-	# to get an API key for your own application.
+    # Build a service object for interacting with the API. Visit
+    # the Google APIs Console <http://code.google.com/apis/console>
+    # to get an API key for your own application.
 
-	# !!! is invoking the program with python3 xx.py ok? or how do you get it to run with the ./run thing?
-	if len(sys.argv) != 5:
-		print("Usage: python3 main.py <google api key> <google engine id> <precision> <query>")
-		sys.exit(-1)
-	
-	dev_key = sys.argv[1]
-	search_engine_id = sys.argv[2]
-	desired_precision = sys.argv[3]
-	query = sys.argv[4]
+    if len(sys.argv) != 5:
+        print(
+            "Usage: python3 main.py <google api key> <google engine id> <precision> <query>"
+        )
+        sys.exit(-1)
 
-	print("Parameters: ")
-	print("Client key  = " + str(dev_key))
-	print("Engine key  = " + str(search_engine_id))
-	print("Query       = " + str(query))
-	print("Precision   = " + str(desired_precision))
-	print("Google Search Results: ")
-	print("======================")
+    dev_key = sys.argv[1]
+    search_engine_id = sys.argv[2]
+    desired_precision = float(sys.argv[3])
+    query = sys.argv[4]
 
-	service = build(
-		"customsearch", "v1", developerKey=dev_key
-	)
+    cur_precision = -1
 
-	full_res = (
-		service.cse()
-		.list(
-			q=query,
-			cx=search_engine_id,
-	)
-		.execute()
-	)
-	
-	top10_res = full_res["items"][0:11]
-	for i, res in enumerate(top10_res):
-		print("Result " + str(i + 1))
-		print("[")
-		print("\n ".join(parse_res(res)))
-		print("]\n")
+    # run first iteration to get the current precision:
+    
+    while cur_precision < desired_precision:
+        if cur_precision == 0:
+            print("Precision of 0. Terminating...")
+            break
 
-		user_relevance = input("Relevant (Y/N)?")
-		# TODO: input checking lol
-
-	# pprint.pprint(top10_res)
-
-	
-	
-
+        res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision)
+        relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
+        expanded_query = ExpandedQuery(
+            query, cur_precision, relevant_docs, irrelevant_docs
+        )
+        expanded_query.getRocchioScore()
+        expanded_query.getModifiedQueryVector()
 
 
 if __name__ == "__main__":
-	main()
+    main()
