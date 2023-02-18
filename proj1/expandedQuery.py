@@ -70,9 +70,8 @@ class ExpandedQuery:
             + beta * np.sum(self.relevant_tfidf, axis=0)
             - gamma * np.sum(self.irrelevant_tfidf, axis=0)
         )
-        print(f"Rocchio score: {score}")
-        print(f"Rocchio score shape: {score.shape}")
         self.rocchio_score = score
+        self.rocchio_score[self.rocchio_score<0] = 0
 
     def computeBigrams(self):
         """
@@ -85,20 +84,20 @@ class ExpandedQuery:
         Returns the modified query vector with additional terms
         """
 
-        # TODO: literally just need to be able to get the top n terms
-        # as chosen by rocchio and get the words from the vocab
-        # my brain is not working with numpy array indexing rn tho
+        sorted_rocchio_scores = np.argsort(self.rocchio_score).tolist()[0]
+        print(f"sorted rocchio scores: {sorted_rocchio_scores}")
+        #print(f"rocchio scores shape: {self.rocchio_score.shape}")
 
-        sorted_rocchio_scores = np.argsort(self.rocchio_score)
         added_word_ct = 0
         added_words = []
         for i in range(1, self.query_tfidf.shape[1] + 1):
-            term_idx = sorted_rocchio_scores[-i][0]
+            term_idx = sorted_rocchio_scores[-i]
             term = self.vocab_list[term_idx]
-            print(f"{i} th highest tf-idf term: {term} (index {term_idx})")
+            # print(f"{i} th highest tf-idf term: {term} (index {term_idx})")
             if term not in self.query.split():
                 added_words.append(term)
                 added_word_ct += 1
             if added_word_ct == 2:
                 break
-        print(f"added words: {added_words}")
+        # print(f"added words: {added_words}")
+        return added_words
