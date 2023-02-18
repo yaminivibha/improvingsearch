@@ -1,7 +1,7 @@
 """
 Implements Rocchio's algorithm
 """
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from nlp_utils import preprocess
 import numpy as np
 
@@ -18,6 +18,7 @@ class ExpandedQuery:
         self.docs = relevant_docs + irrelevant_docs
         self.relevant_docs = relevant_docs
         self.irrelevant_docs = irrelevant_docs
+        # TODO: create empty instances of things initialized in function
         self.computeTfIdfs()
         self.getRocchioScore()
 
@@ -26,11 +27,11 @@ class ExpandedQuery:
         Computes the tfidf vectors for the query, relevant docs,
         and irrelevant docs
         """
-        tfidf = TfidfVectorizer()
+        tfidf = TfidfVectorizer(stop_words="english")
         self.vocab = tfidf.fit(self.docs).vocabulary_
 
         # print(f"vocab type: {type(vocab)}")
-        tfidf_fixedvocab = TfidfVectorizer(vocabulary=self.vocab)
+        tfidf_fixedvocab = TfidfVectorizer(vocabulary=self.vocab, stop_words="english")
         self.vocab_list = tfidf_fixedvocab.get_feature_names_out()
 
         self.query_tfidf = tfidf_fixedvocab.fit_transform([self.query])
@@ -64,10 +65,18 @@ class ExpandedQuery:
         self.rocchio_score = score
         self.rocchio_score[self.rocchio_score<0] = 0
 
-    def computeBigrams(self):
+    def sortQueryTerms(self):
         """
-        Computes the bigrams of the document vectors
+        Computes the bigrams of the relevant document vectors
         """
+        # ngram_range = (2, 2) to extract bigrams
+        count_bigrams = CountVectorizer(ngram_range=(2,2), stop_words="english")
+        count_bigrams.fit_transform(self.relevant_docs)
+        
+        # sort bigrams by number of occurrences, filter out those with 1
+        # iterate through all the bigrams
+                # if both terms in a bigram are in the augmented query, sort the query terms by the bigram
+                # in the case that > 1  bigram contains the same query term, 
         pass
 
     def getModifiedQueryVector(self):
