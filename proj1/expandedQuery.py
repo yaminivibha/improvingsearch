@@ -2,9 +2,8 @@
 Implements Rocchio's algorithm
 """
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from nlp_utils import preprocess
 import numpy as np
-
+from itertools import product
 
 class ExpandedQuery:
     def __init__(self, query, precision, relevant_docs, irrelevant_docs):
@@ -67,18 +66,36 @@ class ExpandedQuery:
 
     def sortQueryTerms(self):
         """
-        Computes the bigrams of the relevant document vectors
+        sorts query terms using bigram counts
         """
-        # ngram_range = (2, 2) to extract bigrams
-        count_bigrams = CountVectorizer(ngram_range=(2,2), stop_words="english")
-        count_bigrams.fit_transform(self.relevant_docs)
         
-        # sort bigrams by number of occurrences, filter out those with 1
-        # iterate through all the bigrams
-                # if both terms in a bigram are in the augmented query, sort the query terms by the bigram
-                # in the case that > 1  bigram contains the same query term, 
-        pass
+        ## ngram_range = (2, 2) to extract bigrams
+        # count_bigrams = CountVectorizer(ngram_range=(2,2), stop_words="english")
+        # bigrams = count_bigrams.fit_transform(self.relevant_docs).tolist()[0]
+        # bigram_vocab = count_bigrams.get_feature_names_out().tolist()
+        # bigram_counts = bigrams.toarray().sum(axis=0)
 
+        # bigrams_freq = dict(zip(bigrams, values))
+
+        # for ng_count, ng_text in sorted([(bigram_counts[i],k) for k,i in bigram_vocab.items()], reverse=True):
+        #     print(ng_count, ng_text)
+        
+        
+        # print(f"bigram list: {bigrams}")
+        # print(f"bigram list shape: {bigrams.shape}")
+        # print(f"bigram vocab: {bigram_vocab}")
+
+
+
+        # query_terms = self.added_words.extend(self.query.split())
+        # possible_bigrams = [ele for ele in product(query_terms, repeat = 2)]
+        # print(f"possible bigrams: {possible_bigrams}")
+
+        # for bigram in possible_bigrams:
+        #     index = bigram_vocab[bigram]
+        #     print(f"{bigram} count: {bigrams[0, index]}")
+
+        
     def getModifiedQueryVector(self):
         """
         Returns the modified query vector with additional terms
@@ -99,5 +116,6 @@ class ExpandedQuery:
                 added_word_ct += 1
             if added_word_ct == 2:
                 break
+        self.added_words = added_words
         # print(f"added words: {added_words}")
         return (' '.join(added_words), ' '.join(added_words) + " " + self.query)

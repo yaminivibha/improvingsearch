@@ -2,11 +2,9 @@
 # -*- coding: utf-8 -*-
 # source: https://github.com/googleapis/google-api-python-client/blob/main/samples/customsearch/main.py
 
-import pprint
 import sys
 import utils
 from expandedQuery import *
-
 
 def main():
     # Build a service object for interacting with the API. Visit
@@ -48,6 +46,8 @@ def main():
         )
         added_terms, query = expanded_query.getModifiedQueryVector()
         print(f"expanded query: {query}")
+        # expanded_query.sortQueryTerms()
+
         # TODO: fix inconsistent naming (desired vs target)
         utils.printFeedback(query, added_terms, desired_precision, cur_precision)
 
