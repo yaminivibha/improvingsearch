@@ -2,6 +2,7 @@
 Helper functions related to query execution, response handling, and input processing
 """
 from googleapiclient.discovery import build
+import regex as re
 
 def getQueryResult(dev_key, search_engine_id, query, desired_precision, top_k):
     """Get the top 10 results for a given query from Google Custom Search API"""
@@ -54,18 +55,24 @@ def getRelevanceFeedback(top10_res):
     irrelevant_docs = []
 
     for i, res in enumerate(top10_res):
-        # TODO: use full body text instead of summary?
         print("Result " + str(i + 1))
         print("[")
         print("\n ".join(parseResults(res)))
         print("]\n")
 
-        # TODO: more robust input checking; reprompt if invalid input
-        user_relevance = input("Relevant (Y/N)?")
-        if user_relevance == "Y" or user_relevance == "y":
-            relevant_docs.append(combineResults(res))
-        else:
-            irrelevant_docs.append(combineResults(res))
+        while True:
+            user_relevance = input("Relevant (Y/N)?")
+
+            # To guard against bad inputs, we only accept "Y", "y", "N", "n"
+            # as valid relevance feedback
+            if not re.match("^[Y,y,N,n]{1,1}$", user_relevance):
+                print('Please type in Y or N (or y or n)')
+            else:
+                if user_relevance == "Y" or user_relevance == "y":
+                    relevant_docs.append(combineResults(res))
+                else:
+                    irrelevant_docs.append(combineResults(res))
+                break
 
     # print(f"Relevant docs:\n {relevant_docs}")
     # print(f"====================")

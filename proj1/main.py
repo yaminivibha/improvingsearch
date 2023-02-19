@@ -50,7 +50,6 @@ def main():
         print(f"expanded query: {query}")
         # expanded_query.sortQueryTerms()
 
-        # TODO: fix inconsistent naming (desired vs target)
         utils.printFeedback(query, added_terms, desired_precision, cur_precision)
 
 
