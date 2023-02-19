@@ -6,7 +6,7 @@ import numpy as np
 from itertools import product
 from typing import List, Tuple
 
-class ExpandedQuery:
+class QueryExpander:
     """
     Class that expands query using Rocchio's algorithm and sorts using bigram counts
     """

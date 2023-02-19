@@ -6,7 +6,11 @@ import regex as re
 from typing import List, Tuple
 
 class QueryExecutor:
-    def ___init__(self, dev_key: str, search_engine_id: str, query: str, desired_precision: float, top_k: int):
+    """
+    Class that handles query execution, response handling, and input processing
+    """
+    def __init__(self, dev_key: str, search_engine_id: str,  
+                 desired_precision: float, top_k: int):
         self.dev_key = dev_key
         self.num_docs = top_k
         self.search_engine_id = search_engine_id
@@ -36,7 +40,7 @@ class QueryExecutor:
         """
         Get the top 10 results for a given query from Google Custom Search API
         """
-        full_res = self.googleservice.cse().list(q=query, cx=self.earch_engine_id,).execute()
+        full_res = self.googleservice.cse().list(q=query, cx=self.search_engine_id,).execute()
 
         return full_res["items"][0:self.top_k + 1]
 
