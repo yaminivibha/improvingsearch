@@ -26,14 +26,13 @@ def main():
 
     cur_precision = -1
 
-    # run first iteration to get the current precision:
-
     while True:
         if cur_precision == 0:
             print("Precision of 0. Terminating...")
             break
         utils.printQueryParams(dev_key, search_engine_id, query, desired_precision)
         res = utils.getQueryResult(dev_key, search_engine_id, query, TOP_K)
+
         # Program should terminate if less than 10 results are returned.
         if len(res) < 10:
                 # TODO: reference behavior if there's less than 10 docs? test "alksdjfal;ksdjf" (keyboard smash query)
