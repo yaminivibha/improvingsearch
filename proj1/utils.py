@@ -4,7 +4,19 @@ Helper functions related to query execution, response handling, and input proces
 from googleapiclient.discovery import build
 import regex as re
 
-
+"""
+class QueryExecutor:
+    def ___init__(self, dev_key, search_engine_id, query, desired_precision, top_k):
+        self.dev_key = dev_key
+        self.num_docs = top_k
+        ....
+        self.googleservice = build("customsearch", ....)
+        ....
+        also make relevant docs and irrelevant docs instance vars?
+        self.relevant_docs = []
+        self.irrelevant_docs = []
+        
+"""
 def printQueryParams(dev_key, search_engine_id, query, desired_precision):
     """
     Prints the arguments sent to the Google Custom Search API
