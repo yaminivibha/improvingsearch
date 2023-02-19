@@ -6,11 +6,19 @@ import numpy as np
 from itertools import product
 from typing import List, Tuple
 
+
 class QueryExpander:
     """
     Class that expands query using Rocchio's algorithm and sorts using bigram counts
     """
-    def __init__(self, query:str, precision:float, relevant_docs:List[str], irrelevant_docs:List[str]):
+
+    def __init__(
+        self,
+        query: str,
+        precision: float,
+        relevant_docs: List[str],
+        irrelevant_docs: List[str],
+    ):
         """
         Parameters:
         query               = current query terms
@@ -33,13 +41,17 @@ class QueryExpander:
         self.docs = relevant_docs + irrelevant_docs
         self.relevant_docs = relevant_docs
         self.irrelevant_docs = irrelevant_docs
-        self.vocab_list, self.query_tfidf, self.relevant_tfidf, self.irrelevant_tfidf = self.computeTfIdfs()
+        (
+            self.vocab_list,
+            self.query_tfidf,
+            self.relevant_tfidf,
+            self.irrelevant_tfidf,
+        ) = self.computeTfIdfs()
         self.rocchio_score = self.getRocchioScore()
         self.getRocchioScore()
-        
+
         self.added_words, self.updated_query = self.getModifiedQueryVector()
         self.sortQueryTerms()
-
 
     def computeTfIdfs(self) -> Tuple[List[str], np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -47,8 +59,10 @@ class QueryExpander:
         and irrelevant docs
         """
         tfidf = TfidfVectorizer(stop_words="english")
-        tfidf_fixedvocab = TfidfVectorizer(vocabulary=tfidf.fit(self.docs).vocabulary_, stop_words="english")
-        
+        tfidf_fixedvocab = TfidfVectorizer(
+            vocabulary=tfidf.fit(self.docs).vocabulary_, stop_words="english"
+        )
+
         vocab_list = tfidf_fixedvocab.get_feature_names_out()
         query_tfidf = tfidf_fixedvocab.fit_transform([self.query])
         relevant_tfidf = tfidf_fixedvocab.fit_transform(self.relevant_docs)
@@ -72,7 +86,7 @@ class QueryExpander:
         )
 
         # set negative scores to 0
-        score[score<0] = 0
+        score[score < 0] = 0
         return score
 
     def sortQueryTerms(self):
@@ -90,13 +104,10 @@ class QueryExpander:
 
         # for ng_count, ng_text in sorted([(bigram_counts[i],k) for k,i in bigram_vocab.items()], reverse=True):
         #     print(ng_count, ng_text)
-        
-        
+
         # print(f"bigram list: {bigrams}")
         # print(f"bigram list shape: {bigrams.shape}")
         # print(f"bigram vocab: {bigram_vocab}")
-
-
 
         # query_terms = self.added_words.extend(self.query.split())
         # possible_bigrams = [ele for ele in product(query_terms, repeat = 2)]
@@ -106,7 +117,6 @@ class QueryExpander:
         #     index = bigram_vocab[bigram]
         #     print(f"{bigram} count: {bigrams[0, index]}")
 
-        
     def getModifiedQueryVector(self) -> Tuple[str, str]:
         """
         Returns the modified query vector with additional terms
@@ -114,7 +124,7 @@ class QueryExpander:
 
         sorted_rocchio_scores = np.argsort(self.rocchio_score).tolist()[0]
         print(f"sorted rocchio scores: {sorted_rocchio_scores}")
-        #print(f"rocchio scores shape: {self.rocchio_score.shape}")
+        # print(f"rocchio scores shape: {self.rocchio_score.shape}")
 
         added_word_ct = 0
         added_words = []
@@ -129,4 +139,4 @@ class QueryExpander:
                 break
         self.added_words = added_words
         # print(f"added words: {added_words}")
-        return (' '.join(added_words), ' '.join(added_words) + " " + self.query)
+        return (" ".join(added_words), " ".join(added_words) + " " + self.query)

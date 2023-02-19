@@ -9,6 +9,7 @@ from utils import QueryExecutor
 
 TOP_K = 10
 
+
 def main():
     # Build a service object for interacting with the API. Visit
     # the Google APIs Console <http://code.google.com/apis/console>
@@ -36,26 +37,23 @@ def main():
         res = exec.getQueryResult(query)
         # Program should terminate if less than 10 results are returned.
         if len(res) < 10:
-                # TODO: reference behavior if there's less than 10 docs? test "alksdjfal;ksdjf" (keyboard smash query)
-                print("Less than 10 results returned, done")
-                break
+            # TODO: reference behavior if there's less than 10 docs? test "alksdjfal;ksdjf" (keyboard smash query)
+            print("Less than 10 results returned, done")
+            break
         relevant_docs, irrelevant_docs = exec.getRelevanceFeedback(res)
         cur_precision = exec.computePrecision(len(relevant_docs))
-        
+
         # Program should terminate of desired precision of query is reached
         if cur_precision >= desired_precision:
-                exec.printFeedback(query, "", cur_precision)
-                break
+            exec.printFeedback(query, "", cur_precision)
+            break
 
-        expander = QueryExpander(
-            query, cur_precision, relevant_docs, irrelevant_docs
-        )
+        expander = QueryExpander(query, cur_precision, relevant_docs, irrelevant_docs)
         added_terms, query = expander.getModifiedQueryVector()
         print(f"expanded query: {query}")
         # expanded_query.sortQueryTerms()
 
         exec.printFeedback(query, added_terms, cur_precision)
-
 
 
 if __name__ == "__main__":
