@@ -18,13 +18,13 @@ class ExpandedQuery:
         self.relevant_docs = relevant_docs
         self.irrelevant_docs = irrelevant_docs
         # TODO: create empty instances of things initialized in function
-	# self.vocab = 
-	# self.vocab_list
-	# self.query_tfidf
-	# self.relevant_tfidf
-	# self.irrelevant_tfidf
-	# self.rocchio_score
-	# self.added_words = ""
+        # self.vocab = 
+        # self.vocab_list
+        # self.query_tfidf
+        # self.relevant_tfidf
+        # self.irrelevant_tfidf
+        # self.rocchio_score
+        # self.added_words = ""
         self.computeTfIdfs()
         self.getRocchioScore()
 

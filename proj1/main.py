@@ -34,14 +34,18 @@ def main():
             break
         utils.printQueryParams(dev_key, search_engine_id, query, desired_precision)
         res = utils.getQueryResult(dev_key, search_engine_id, query, TOP_K)
+        # Program should terminate if less than 10 results are returned.
+        if len(res) < 10:
+                # TODO: reference behavior if there's less than 10 docs? test "alksdjfal;ksdjf" (keyboard smash query)
+                print("Less than 10 results returned, done")
+                break
         relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
         cur_precision = utils.computePrecision(len(relevant_docs), TOP_K)
         
-        # check termination
+        # Program should terminate of desired precision of query is reached
         if cur_precision >= desired_precision:
                 utils.printFeedback(query, "", desired_precision, cur_precision)
                 break
-        # terminate if less than 10 docs
 
         expanded_query = ExpandedQuery(
             query, cur_precision, relevant_docs, irrelevant_docs
