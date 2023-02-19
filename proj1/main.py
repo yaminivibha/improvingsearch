@@ -3,7 +3,6 @@
 # source: https://github.com/googleapis/google-api-python-client/blob/main/samples/customsearch/main.py
 
 import sys
-import utils
 from QueryExpander import QueryExpander
 from utils import QueryExecutor
 
@@ -35,6 +34,7 @@ def main():
             break
         exec.printQueryParams(query)
         res = exec.getQueryResult(query)
+        
         # Program should terminate if less than 10 results are returned.
         if len(res) < 10:
             # TODO: reference behavior if there's less than 10 docs? test "alksdjfal;ksdjf" (keyboard smash query)
@@ -49,7 +49,7 @@ def main():
             break
 
         expander = QueryExpander(query, cur_precision, relevant_docs, irrelevant_docs)
-        added_terms, query = expander.getModifiedQueryVector()
+        added_terms, query = expander.getAddedWords()
         print(f"expanded query: {query}")
         # expanded_query.sortQueryTerms()
 
