@@ -4,7 +4,7 @@
 
 import sys
 import utils
-from expandedQuery import *
+from expandedQuery import QueryExecutor
 
 TOP_K = 10
 
@@ -23,6 +23,7 @@ def main():
     search_engine_id = sys.argv[2]
     desired_precision = float(sys.argv[3])
     query = sys.argv[4]
+    exec = QueryExecutor(dev_key, search_engine_id, query, desired_precision, TOP_K)
 
     cur_precision = -1
 
@@ -30,20 +31,19 @@ def main():
         if cur_precision == 0:
             print("Precision of 0. Terminating...")
             break
-        utils.printQueryParams(dev_key, search_engine_id, query, desired_precision)
-        res = utils.getQueryResult(dev_key, search_engine_id, query, TOP_K)
-
+        exec.printQueryParams(query)
+        res = exec.getQueryResult(query)
         # Program should terminate if less than 10 results are returned.
         if len(res) < 10:
                 # TODO: reference behavior if there's less than 10 docs? test "alksdjfal;ksdjf" (keyboard smash query)
                 print("Less than 10 results returned, done")
                 break
         relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
-        cur_precision = utils.computePrecision(len(relevant_docs), TOP_K)
+        cur_precision = utils.computePrecision(len(relevant_docs))
         
         # Program should terminate of desired precision of query is reached
         if cur_precision >= desired_precision:
-                utils.printFeedback(query, "", desired_precision, cur_precision)
+                utils.printFeedback(query, "", cur_precision)
                 break
 
         expanded_query = ExpandedQuery(
@@ -53,7 +53,7 @@ def main():
         print(f"expanded query: {query}")
         # expanded_query.sortQueryTerms()
 
-        utils.printFeedback(query, added_terms, desired_precision, cur_precision)
+        utils.printFeedback(query, added_terms, cur_precision)
 
 
 

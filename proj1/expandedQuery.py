@@ -4,9 +4,10 @@ Implements Rocchio's algorithm
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 import numpy as np
 from itertools import product
+from typing import List, Tuple
 
 class ExpandedQuery:
-    def __init__(self, query, precision, relevant_docs, irrelevant_docs):
+    def __init__(self, query:str, precision:float, relevant_docs:List[str], irrelevant_docs:List[str]):
         """
         TODO: explain instance vars
         query = String containing current query terms
