@@ -6,6 +6,8 @@ import sys
 import utils
 from expandedQuery import *
 
+TOP_K = 10
+
 def main():
     # Build a service object for interacting with the API. Visit
     # the Google APIs Console <http://code.google.com/apis/console>
@@ -31,9 +33,9 @@ def main():
             print("Precision of 0. Terminating...")
             break
 
-        res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision)
+        res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision, TOP_K)
         relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
-        cur_precision = utils.computePrecision(len(relevant_docs))
+        cur_precision = utils.computePrecision(len(relevant_docs), TOP_K)
         
         # check termination
         if cur_precision >= desired_precision:

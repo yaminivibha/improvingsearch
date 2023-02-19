@@ -3,7 +3,7 @@ Helper functions related to query execution, response handling, and input proces
 """
 from googleapiclient.discovery import build
 
-def getQueryResult(dev_key, search_engine_id, query, desired_precision):
+def getQueryResult(dev_key, search_engine_id, query, desired_precision, top_k):
     """Get the top 10 results for a given query from Google Custom Search API"""
     # TODO: separate these prints from the actual sending of query
     print("Parameters:")
@@ -20,7 +20,7 @@ def getQueryResult(dev_key, search_engine_id, query, desired_precision):
 
     # TODO: skip non-html files
     # may have to return the entire result from this fn?
-    return full_res["items"][0:11]
+    return full_res["items"][0:top_k + 1]
 
 
 def parseResults(res):
@@ -74,7 +74,7 @@ def getRelevanceFeedback(top10_res):
     return relevant_docs, irrelevant_docs
 
 
-def printFeedback(query, expanded_terms, target_precision, cur_precision):
+def printFeedback(query, expanded_terms, desired_precision, cur_precision):
     """
     Returns query feedback summary to user
     """
@@ -82,8 +82,8 @@ def printFeedback(query, expanded_terms, target_precision, cur_precision):
     print("FEEDBACK SUMMARY")
     print(f"Query: {query}")
     print(f"Precision: {cur_precision}")
-    if cur_precision < target_precision:
-        print(f"Still below the desired precision of {target_precision}")
+    if cur_precision < desired_precision:
+        print(f"Still below the desired precision of {desired_precision}")
         print("Indexing results ....")
         print("Indexing results ....")
         print(f"Augmenting by {expanded_terms}")
@@ -91,12 +91,11 @@ def printFeedback(query, expanded_terms, target_precision, cur_precision):
         print("Desired precision reached, done")
     return
 
-def computePrecision(num_rel):
+def computePrecision(num_rel, num_docs):
     """
     Computes the precision of the web search results using
     the formula below:
     
     precision = |relevant docs that are retrieved| / |retrieved docs|
     """
-    # TODO: maybe not hardcode in 10 bc style ick but it's literally fine
-    return num_rel / 10
+    return num_rel / num_docs
