@@ -114,14 +114,15 @@ class QueryExpander:
         list(everygrams(query))
         print(f"all possible ngrams of query: {possible_ngrams}")
         ngram_counts = {k:0 for k in possible_ngrams}
-        print(f"ngram_counts: {ngram_counts}")
+        #print(f"ngram_counts: {ngram_counts}")
         
         for doc in processed_rel_docs:
-            doc_ngrams = list(everygrams(doc.split()))
+            doc_ngrams = list(everygrams(doc))
+            print(f"doc ngrams: {doc_ngrams}")
             for ngram in doc_ngrams:
                 if ngram in ngram_counts:
                     ngram_counts[ngram] += 1
-
+        print(f"ngram_counts: {ngram_counts}")
 
         # we can manually preprocess & pass in the stuff we want / keep track of it
         # or we can just use the sklearn CountVectorizer but we have figure out indexes
@@ -150,3 +151,21 @@ class QueryExpander:
         self.added_words = added_words
         # print(f"added words: {added_words}")
         return (" ".join(added_words), " ".join(added_words) + " " + self.query)
+    
+
+#ngram_counts: 
+# {('tabs',): 6, 
+# ('guitar',): 3, 
+# ('ultimate',): 1, 
+# ('tabs', 'guitar'): 0, 
+# ('tabs', 'ultimate'): 0, 
+# ('guitar', 'tabs'): 2, 
+# ('guitar', 'ultimate'): 0, 
+# ('ultimate', 'tabs'): 0, 
+# ('ultimate', 'guitar'): 1, 
+# ('tabs', 'guitar', 'ultimate'): 0, 
+# ('tabs', 'ultimate', 'guitar'): 0, 
+# ('guitar', 'tabs', 'ultimate'): 0, 
+# ('guitar', 'ultimate', 'tabs'): 0, 
+# ('ultimate', 'tabs', 'guitar'): 0, 
+# ('ultimate', 'guitar', 'tabs'): 1}
