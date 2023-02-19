@@ -8,8 +8,6 @@ from typing import List, Tuple
 from nltk.util import everygrams
 from collections import defaultdict
 from nlp_utils import preprocess, tokenize, remove_stop_words
-import operator
-
 
 
 class QueryExpander:
@@ -118,7 +116,7 @@ class QueryExpander:
             possible_ngrams.extend(list(permutations(query, i)))
         list(everygrams(query))
         print(f"all possible ngrams of query: {possible_ngrams}")
-        ngram_counts = {k: 0 for k in possible_ngrams} # TODO: get_ngram_counts()
+        ngram_counts = {k: 0 for k in possible_ngrams}  # TODO: get_ngram_counts()
         # print(f"ngram_counts: {ngram_counts}")
 
         for doc in processed_rel_docs:
@@ -129,28 +127,20 @@ class QueryExpander:
                     ngram_counts[ngram] += 1
         print(f"ngram_counts: {ngram_counts}")
 
-        # ngram_counts {n_gram: (n, count)}
-        ngram_counts_with_n = dict()
-        for ngram, count in ngram_counts.items():
-                ngram_counts_with_n[ngram] = [len(ngram), count]
-
         # actual sorting part
-        # Sort by ngram_counts by decreasing n 
-        def sort_key(ngram): # TODO: typehinting
-           return len(ngram)
-        
-        sorted_ngram_counts  = dict(sorted(ngram_counts.items(), key=operator.itemgetter(1,0), reverse=True))
-        print(f"sorted_ngram by n: {sorted_ngram_counts}")
+        # Sort by ngram_counts by decreasing n
+        def ngram_sort(item: Tuple[Tuple[str], int]) -> Tuple[int]:
+            ngram = item[0]
+            return len(ngram), item[1]
 
-        # Secondarily sort by n_gram counts
-        sorted_ngram_counts  = dict(sorted(ngram_counts.items(), key=operator.itemgetter(1),reverse=True))
-        print(f"sorted_ngram_counts by counts: {sorted_ngram_counts}")
+        sorted_ngram_counts = dict(
+            sorted(ngram_counts.items(), key=ngram_sort, reverse=True)
+        )
+        print(f"sorted_ngram by n: {sorted_ngram_counts}")
 
         # grab the top n_gram
         # Whatever words are not in the n_gram, add the words to the end
         # theoretically: could have more n_grams in the expanded query (multiple phrases) but this is enough for a simple query
-
-
 
     def getAddedWords(self) -> Tuple[str, str]:
         """
@@ -198,9 +188,9 @@ class QueryExpander:
 # discard any ngram with count: 0
 # give more weight to higher n ngrams? but still want to give weight to high counts
 # weighting = count * n
-# 
+#
 # Approach 1:
-# Sort by ngram_counts by decreasing n 
+# Sort by ngram_counts by decreasing n
 # Secondarily sort by n_gram counts
 # grab the top n_gram
 # Whatever words are not in the n_gram, add the words to the end
