@@ -9,6 +9,7 @@ from nltk.util import everygrams
 from collections import defaultdict
 from nlp_utils import preprocess, tokenize, remove_stop_words
 
+
 class QueryExpander:
     """
     Class that expands query using Rocchio's algorithm and sorts using bigram counts
@@ -95,7 +96,7 @@ class QueryExpander:
         """
         sorts query terms using bigram counts
         """
-        
+
         # we only care bout the bigrams that contain the added words
         # so we need to extract the bigrams from the relevant docs
         # and then find the bigrams that contain the added words
@@ -109,13 +110,13 @@ class QueryExpander:
         query = self.updated_query.split()
         print(f"query: {query}")
         possible_ngrams = []
-        for i in range(1, len(query)+1):
-            possible_ngrams.extend(list(permutations(query, i)))        
+        for i in range(2, len(query) + 1):
+            possible_ngrams.extend(list(permutations(query, i)))
         list(everygrams(query))
         print(f"all possible ngrams of query: {possible_ngrams}")
-        ngram_counts = {k:0 for k in possible_ngrams}
-        #print(f"ngram_counts: {ngram_counts}")
-        
+        ngram_counts = {k: 0 for k in possible_ngrams}
+        # print(f"ngram_counts: {ngram_counts}")
+
         for doc in processed_rel_docs:
             doc_ngrams = list(everygrams(doc))
             print(f"doc ngrams: {doc_ngrams}")
@@ -151,21 +152,21 @@ class QueryExpander:
         self.added_words = added_words
         # print(f"added words: {added_words}")
         return (" ".join(added_words), " ".join(added_words) + " " + self.query)
-    
 
-#ngram_counts: 
-# {('tabs',): 6, 
-# ('guitar',): 3, 
-# ('ultimate',): 1, 
-# ('tabs', 'guitar'): 0, 
-# ('tabs', 'ultimate'): 0, 
-# ('guitar', 'tabs'): 2, 
-# ('guitar', 'ultimate'): 0, 
-# ('ultimate', 'tabs'): 0, 
-# ('ultimate', 'guitar'): 1, 
-# ('tabs', 'guitar', 'ultimate'): 0, 
-# ('tabs', 'ultimate', 'guitar'): 0, 
-# ('guitar', 'tabs', 'ultimate'): 0, 
-# ('guitar', 'ultimate', 'tabs'): 0, 
-# ('ultimate', 'tabs', 'guitar'): 0, 
+
+# ngram_counts:
+# {('tabs',): 6,
+# ('guitar',): 3,
+# ('ultimate',): 1,
+# ('tabs', 'guitar'): 0,
+# ('tabs', 'ultimate'): 0,
+# ('guitar', 'tabs'): 2,
+# ('guitar', 'ultimate'): 0,
+# ('ultimate', 'tabs'): 0,
+# ('ultimate', 'guitar'): 1,
+# ('tabs', 'guitar', 'ultimate'): 0,
+# ('tabs', 'ultimate', 'guitar'): 0,
+# ('guitar', 'tabs', 'ultimate'): 0,
+# ('guitar', 'ultimate', 'tabs'): 0,
+# ('ultimate', 'tabs', 'guitar'): 0,
 # ('ultimate', 'guitar', 'tabs'): 1}

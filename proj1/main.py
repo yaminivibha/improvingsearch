@@ -34,7 +34,7 @@ def main():
             break
         exec.printQueryParams(query)
         res = exec.getQueryResult(query)
-        
+
         # Program should terminate if less than 10 results are returned.
         if len(res) < 10:
             # TODO: reference behavior if there's less than 10 docs? test "alksdjfal;ksdjf" (keyboard smash query)
