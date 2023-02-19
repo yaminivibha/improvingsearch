@@ -37,23 +37,23 @@ def main():
 
         # Program should terminate if less than 10 results are returned.
         if len(res) < 10:
-            # TODO: reference behavior if there's less than 10 docs? test "alksdjfal;ksdjf" (keyboard smash query)
             print("Less than 10 results returned, done")
             break
         relevant_docs, irrelevant_docs = exec.getRelevanceFeedback(res)
         cur_precision = exec.computePrecision(len(relevant_docs))
 
-        # Program should terminate of desired precision of query is reached
+        # Program should terminate of desired precision of query is reached.
         if cur_precision >= desired_precision:
             exec.printFeedback(query, "", cur_precision)
             break
 
         expander = QueryExpander(query, cur_precision, relevant_docs, irrelevant_docs)
         added_terms, query = expander.getAddedWords()
-        print(f"expanded query: {query}")
-        # expanded_query.sortQueryTerms()
+        # print(f"expanded query: {query}")
+        sorted_query = expander.sortQueryTerms()
 
         exec.printFeedback(query, added_terms, cur_precision)
+        query = sorted_query
 
 
 if __name__ == "__main__":

@@ -108,7 +108,7 @@ class QueryExpander:
             processed_rel_docs.append(doc)
 
         query = self.updated_query.split()
-        print(f"query: {query}")
+        # print(f"query: {query}")
         possible_ngrams = []
 
         # Generate all possible ngrams of length 2 - length of query
@@ -120,7 +120,7 @@ class QueryExpander:
         # print(f"ngram_counts: {ngram_counts}")
 
         for doc in processed_rel_docs:
-            doc_ngrams = list(everygrams(doc))
+            doc_ngrams = list(everygrams(doc, max_len=len(query)))
             print(f"doc ngrams: {doc_ngrams}")
             for ngram in doc_ngrams:
                 if ngram in ngram_counts:
@@ -128,18 +128,33 @@ class QueryExpander:
         print(f"ngram_counts: {ngram_counts}")
 
         # actual sorting part
+        # get rid of count: 0
+        ngram_counts = {ngram:count for ngram, count in ngram_counts.items() if count !=0}
+        print(f"ngram_counts without 0s: {ngram_counts}")
+
         # Sort by ngram_counts by decreasing n
         def ngram_sort(item: Tuple[Tuple[str], int]) -> Tuple[int]:
             ngram = item[0]
             return len(ngram), item[1]
 
-        sorted_ngram_counts = dict(
-            sorted(ngram_counts.items(), key=ngram_sort, reverse=True)
-        )
+        sorted_ngram_counts = sorted(ngram_counts.items(), key=ngram_sort, reverse=True)
         print(f"sorted_ngram by n: {sorted_ngram_counts}")
 
         # grab the top n_gram
+        top_ngram = sorted_ngram_counts[0][0]
+        sorted_query = " ".join(top_ngram)
+        print(f"top ngram: {top_ngram}")
+        
         # Whatever words are not in the n_gram, add the words to the end
+        if len(top_ngram) < len(query):
+            for word in query:
+                if word not in top_ngram:
+                    sorted_query = sorted_query + " " + word
+        
+        # print(f"sorted query??  : {sorted_query}")
+        
+        return sorted_query
+                        
         # theoretically: could have more n_grams in the expanded query (multiple phrases) but this is enough for a simple query
 
     def getAddedWords(self) -> Tuple[str, str]:
