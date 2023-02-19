@@ -4,9 +4,11 @@ Helper functions related to query execution, response handling, and input proces
 from googleapiclient.discovery import build
 import regex as re
 
-def getQueryResult(dev_key, search_engine_id, query, desired_precision, top_k):
-    """Get the top 10 results for a given query from Google Custom Search API"""
-    # TODO: separate these prints from the actual sending of query
+
+def printQueryParams(dev_key, search_engine_id, query, desired_precision):
+    """
+    Prints the arguments sent to the Google Custom Search API
+    """
     print("Parameters:")
     print("Client key  = " + str(dev_key))
     print("Engine key  = " + str(search_engine_id))
@@ -14,13 +16,17 @@ def getQueryResult(dev_key, search_engine_id, query, desired_precision, top_k):
     print("Precision   = " + str(desired_precision))
     print("Google Search Results: ")
     print("======================")
+    return
+    
+def getQueryResult(dev_key, search_engine_id, query, top_k):
+    """
+    Get the top 10 results for a given query from Google Custom Search API
+    """
     # TODO: build class for QueryExecutor so service is an instance variable
     service = build("customsearch", "v1", developerKey=dev_key)
 
     full_res = service.cse().list(q=query, cx=search_engine_id,).execute()
 
-    # TODO: skip non-html files
-    # may have to return the entire result from this fn?
     return full_res["items"][0:top_k + 1]
 
 
@@ -47,9 +53,8 @@ def combineResults(res):
 
 def getRelevanceFeedback(top10_res):
     """
-    Returns corpus (dict) with relevance information as marked by the user
-    Return format:
-    {docid: {Summary: " ", "Relevant": 1}, ....}
+    Returns a list of relevant docs and list of irrelevant docs
+    as marked by the user
     """
     relevant_docs = []
     irrelevant_docs = []

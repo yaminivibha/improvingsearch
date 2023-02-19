@@ -32,8 +32,8 @@ def main():
         if cur_precision == 0:
             print("Precision of 0. Terminating...")
             break
-
-        res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision, TOP_K)
+        utils.printQueryParams(dev_key, search_engine_id, query, desired_precision)
+        res = utils.getQueryResult(dev_key, search_engine_id, query, TOP_K)
         relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
         cur_precision = utils.computePrecision(len(relevant_docs), TOP_K)
         
