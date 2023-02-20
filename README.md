@@ -111,6 +111,64 @@ Here, we will give some justifications regarding specific parts of this pre-proc
 
 ### Query Expansion technique
 
+## Ordering the Terms in the Expanded Query
+
+### Context
+
+- After determining which two terms from the relevant documents we want to include in our next round of querying, one more question remains: ******What order should the words of the expanded query be in?****** For example, “new york city restaurant” would be a far better (closer to the user’s intent) query than “new city restaurant york”, and would probably yield better results.
+- Goal: We wanted to order the words in the augmented query based on the contents of the query results from the previous iteration and their relevance judgments, but without querying Google again.
+- There are many (n!) alternate ways of ordering the words in a query of n terms and we conducted a very preliminary literature review to determine the best possible way to order the words in the expanded query, but most papers focused on mechanisms of query expansion (how might we determine what terms from the corpus to add to the query to retrieve more relevant results?) and not specifically the query reordering.
+- Our high-level query reordering algorithm is based off of the term proximity query expansion approaches we saw in lecture and in our preliminary literature review [[4]](https://www.sciencedirect.com/science/article/pii/S0020025511001356). The intuition behind these term proximity approaches is that query terms that appear close to each other are likely phrases (e.g. “new york city”, rather than “new city”). We make the simplification of using N-grams (contiguous sequences of words) in contrast to terms in a window size, which more sophisticated algorithms use.
+
+### Query reordering algorithm:
+
+- Generate all possible permutations of N-grams of length 2 → the length of the query and count the number of times each ngram appears in the *relevant docs only*.
+    - 1-grams are not generated because they are single terms, and would therefore automatically occur frequently in documents. The goal here is to give more “weight” to phrases of at least 2 words, even if they occur less frequently than individual words.
+
+```python
+{('new', 'york'): 6,
+ ('new', 'city'): 0,
+ ('new', 'restaurant'): 1,
+ ('york', 'city'): 6,
+ ('york', 'restaurant'): 3,
+ ('york', 'new'): 0,
+
+...
+
+('new', 'york','restaurant'): 1,
+...
+('new', 'york', 'city', 'restaurant'): 6,
+...
+('new', 'restaurant', 'city', 'york'): 0,
+}
+```
+
+- Filter out the N-grams with count: 0. Having a count: 0 means that this permutation of the query terms does not occur in the relevant documents at all and thus should not be considered as a potential reordered query candidate.
+- Sort this dictionary containing all the permutations of the query words by decreasing N. We do this because we want to select the longest phrase that occurs in the corpus of relevant documents, e.g. give more weight to “new york city” than “new york”
+- Secondarily sort this dictionary by the number of times the N-gram occurs in the relevant documents, in decreasing order. We sort the dictionary by this “phrase frequency” after sorting by the length of the phrase to always prioritize longer phrases.
+
+```python
+# filtered & sorted:
+{('new', 'york', 'city', 'restaurant'): 6,
+('new', 'york','restaurant'): 1,
+...
+('new', 'york'): 6,
+ ('york', 'city'): 6,
+ ('york', 'restaurant'): 3,
+('new', 'restaurant'): 1,
+...
+}
+```
+
+- Take the longest, most frequently occuring phrase (the N-gram in the first entry) and append whatever query terms that are left over and are not in that N-gram to the augmented query. e.g. if “new york city” is the top N-gram and “new city restaurant york” is the augmented query, our reordered expanded query is “new york city restaurant.” These leftover query terms are appended in the order of the previous iteration’s query.
+
+### Other designs considered
+
+- This approach seemed to work well enough for our constrained context. With the test case of the query “brin”, the augmented query became “brin sergey google”, and the final sorted augmented query because “sergey brin google”, which was the behavior we were hoping for. Other modifications to our algorithm that we considered implemented given more time and energy include:
+    - Considering multiple N-grams in the query: A longer query can contain multiple phrases, not just one phrase. In our algorithm, we only consider the case of one phrase and append the rest of the query terms to the end and this could obviously be improved by repeating the process on the leftover query terms. However, this approach is enough for simple query cases.
+    - Establish a weighting scheme: We prioritize longer N-grams over slightly shorter N-grams no matter how less frequent the longer N-gram. This scheme seemed to work reasonably well, but in a case where a 4-gram appears once and a 3-gram (that is not in the 4-gram) appears 10 times, we would probably want to include the 3-gram over the 4-gram. This necessitates a more flexible weighting scheme, but these weights would need to be determined empirically via more testing. Ideally, the weight of the N-gram should be a function of the N-gram’s frequency and N.
+    - Adding support for term proximity windows instead of enforcing contiguous phrases via N-grams
+
 ## Credentials For Testing
 Below are the credentials needed to test the information retrieval system. These credentials were generated following [these instructions](http://www.cs.columbia.edu/~gravano/cs6111/proj1.html#:~:text=As%20a%20second%20step%2C%20you%20will%20have%20to%20sign%20up%20for%20the%20Programmable%20Search%20Engine%20service%20(https%3A//programmablesearchengine.google.com/about/)%3A).
 
