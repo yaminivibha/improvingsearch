@@ -5,6 +5,7 @@ from typing import List
 
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction import text
+from urllib.parse import urlparse
 
 
 def preprocess(doc: str) -> str:
@@ -35,3 +36,12 @@ def processRelDocs(relevant_docs: List[str]) -> List[List[str]]:
         doc = remove_stop_words(doc)
         processed_rel_docs.append(doc)
     return processed_rel_docs
+
+
+def urlParse(url: str) -> str:
+    """Parse URL to get the path as a string of words (no punctuation)"""
+    url_path = urlparse(url).path
+    translator = str.maketrans(
+        punctuation, " " * len(punctuation)
+    )  # map punctuation to space
+    return url_path.translate(translator)
