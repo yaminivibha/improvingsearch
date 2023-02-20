@@ -51,7 +51,7 @@ Below are the credentials needed to test the information retrieval system. These
 ```45add40315937647f```
 
         
-### High-Level Control Flow and Components
+## High-Level Control Flow and Components
 A code trace for an expected program execution is as follows:
 
 - User inputs API credentials,search query and desired precision when invoking `main.py`. 
@@ -70,7 +70,7 @@ A code trace for an expected program execution is as follows:
         - Reference implementation ends with a `NullPointerError`
         - We tested this by using a keyboard smash as the query, e.g. “kasjdfaksjdf;kaldf”
 
-### External Packages
+## External Packages
 |         Library/Package         | Use case                                                                                                                                                                                                                                    |
 |:-------------------------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | nltk.tokenize.word_tokenize     | Generates token strings from a single, long document string. For example, “I am a student in 6111 Databases!” → [”I”, “am”, “a”, “student”, “in”, “6111”, “Databases”]                                                                      |
@@ -79,7 +79,7 @@ A code trace for an expected program execution is as follows:
 | nltk.util.everygrams            | Creates n-grams from the retrieved documents. For example, creating trigrams: “i am a student in 6111 databases” → [(”I”, “am”, “a”), (”am”, “a”, “student), (”a”, “student”, “in”), (”student”, “in”, “6111”), (”in”, “6111”, “databases)] |
 | sklearn.TfIdfVectorizer         | Creates TF-IDF matrices from lists of documents, using either a fixed vocabulary or generating vocabulary from the given document.                                                                                                          |
 
-## TODO: Query-Modification Method
+## Query-Modification Method
 
 ### Collecting Document Information
 - We used three pieces of information for each search result: the title, the snippet, and the URL. From the URL, we took the path and tokenized each item in the path as separated by punctuation. For example, we would parse the url `[http://www.wikipedia.org/wiki/Sergey_Brin/](http://www.wikipedia.org/Sergey_Brin/)` as  `wiki sergey brin`. Highly relevant associated query terms were often located in URLs, and because we only use snippets and not the full text of the documents, the search terms found in the URLs were useful.
@@ -104,9 +104,7 @@ Here, we will give some justifications regarding specific parts of this pre-proc
     - Stemming user’s query terms would match more documents since the alternate word forms for the user’s query term are matched too.
     - This would increase recall, but reduces precision [5], and this system’s primary goal is to increase precision. Thus, we chose not to include it here. 
 
-### Query Expansion technique
-
-## Ordering the Terms in the Expanded Query
+### Augmenting the Query with Additional Terms
 - The main algorithm used is the modified Rocchio’s algorithm, which is a vector space information retrieval model where text documents are represented as vectors. At a high-level, Rocchio’s algorithm computes the score for a particular candidate query expansion term with the goal of minimizing the cosine similarity between the query matrix and matrix representing the irrelevant docs, while maximizing the cosine similarity between the query matrix and relevant docs matrix.
 - Rocchio’s Algorithm is as follows:
 $$Q_1 = \alpha Q_0 + \frac{\beta}{|D_r|} \sum_{d_j \in D_r} d_j - \frac{\gamma}{|D_n|}\sum_{d_j\in D_n} d_j$$
@@ -122,14 +120,16 @@ $$Q_1 = \alpha Q_0 + \frac{\beta}{|D_r|} \sum_{d_j \in D_r} d_j - \frac{\gamma}{
     - On average, in each round of query expansion, the vocabulary was approximately 150 words. Rocchio’s algorithm was able to surface 2 relevant terms, unique from the original query, that were not synonyms of the original query in almost all cases.
     - Since we are required to maintain the original query string in every round of search anyway, adding synonyms to the augmented query did not increase precision to the same level as implementing Rocchio’s algorithm did.
 
-### Context
+
+### Ordering the Terms in the Expanded Query
+#### Context
 
 - After determining which two terms from the relevant documents we want to include in our next round of querying, one more question remains: **What order should the words of the expanded query be in?** For example, “new york city restaurant” would be a far better (closer to the user’s intent) query than “new city restaurant york”, and would probably yield better results.
 - Goal: We wanted to order the words in the augmented query based on the contents of the query results from the previous iteration and their relevance judgments, but without querying Google again.
 - There are many (n!) alternate ways of ordering the words in a query of n terms and we conducted a very preliminary literature review to determine the best possible way to order the words in the expanded query, but most papers focused on mechanisms of query expansion (how might we determine what terms from the corpus to add to the query to retrieve more relevant results?) and not specifically the query reordering.
 - Our high-level query reordering algorithm is based off of the term proximity query expansion approaches we saw in lecture and in our preliminary literature review [[4]](https://www.sciencedirect.com/science/article/pii/S0020025511001356). The intuition behind these term proximity approaches is that query terms that appear close to each other are likely phrases (e.g. “new york city”, rather than “new city”). We make the simplification of using N-grams (contiguous sequences of words) in contrast to terms in a window size, which more sophisticated algorithms use.
 
-### Query reordering algorithm:
+#### Query reordering algorithm:
 
 - Generate all possible permutations of N-grams of length 2 → the length of the query and count the number of times each ngram appears in the *relevant docs only*.
     - 1-grams are not generated because they are single terms, and would therefore automatically occur frequently in documents. The goal here is to give more “weight” to phrases of at least 2 words, even if they occur less frequently than individual words.
@@ -171,7 +171,7 @@ $$Q_1 = \alpha Q_0 + \frac{\beta}{|D_r|} \sum_{d_j \in D_r} d_j - \frac{\gamma}{
 
 - Take the longest, most frequently occuring phrase (the N-gram in the first entry) and append whatever query terms that are left over and are not in that N-gram to the augmented query. e.g. if “new york city” is the top N-gram and “new city restaurant york” is the augmented query, our reordered expanded query is “new york city restaurant.” These leftover query terms are appended in the order of the previous iteration’s query.
 
-### Other designs considered
+#### Other designs considered
 
 - This approach seemed to work well enough for our constrained context. With the test case of the query “brin”, the augmented query became “brin sergey google”, and the final sorted augmented query because “sergey brin google”, which was the behavior we were hoping for. Other modifications to our algorithm that we considered implemented given more time and energy include:
     - Considering multiple N-grams in the query: A longer query can contain multiple phrases, not just one phrase. In our algorithm, we only consider the case of one phrase and append the rest of the query terms to the end and this could obviously be improved by repeating the process on the leftover query terms. However, this approach is enough for simple query cases.
