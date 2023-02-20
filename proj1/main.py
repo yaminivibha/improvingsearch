@@ -1,80 +1,64 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# source: https://github.com/googleapis/google-api-python-client/blob/main/samples/customsearch/main.py
 
-import pprint
 import sys
+from QueryExpander import QueryExpander
+from QueryExecutor import QueryExecutor
 
-from googleapiclient.discovery import build
+TOP_K = 10
 
-def parse_res(res):
-	"""
-	Returns the URL, Title, Summary of a Google Custom Search API Result
-	"""
-	
-	parsed_res = [" URL: " + res["formattedUrl"],
-			 "Title: " + res["title"],
-			"Summary: " + res["snippet"]]
-
-	return parsed_res
 
 def main():
-	# Build a service object for interacting with the API. Visit
-	# the Google APIs Console <http://code.google.com/apis/console>
-	# to get an API key for your own application.
+    """
+    Main function that handles the control flow of the information retrieval system
+    """
 
-	# !!! is invoking the program with python3 xx.py ok? or how do you get it to run with the ./run thing?
-	if len(sys.argv) != 5:
-		print("Usage: python3 main.py <google api key> <google engine id> <precision> <query>")
-		sys.exit(-1)
-	
-	dev_key = sys.argv[1]
-	search_engine_id = sys.argv[2]
-	desired_precision = sys.argv[3]
-	query = sys.argv[4]
+    if len(sys.argv) != 5:
+        print(
+            "Usage: python3 main.py <google api key> <google engine id> <precision> <query>"
+        )
+        sys.exit(-1)
 
-	print("Parameters: ")
-	print("Client key  = " + str(dev_key))
-	print("Engine key  = " + str(search_engine_id))
-	print("Query       = " + str(query))
-	print("Precision   = " + str(desired_precision))
-	print("Google Search Results: ")
-	print("======================")
+    dev_key = sys.argv[1]
+    search_engine_id = sys.argv[2]
+    desired_precision = float(sys.argv[3])
+    query = sys.argv[4]
 
-	service = build(
-		"customsearch", "v1", developerKey=dev_key
-	)
+    engine = QueryExecutor(dev_key, search_engine_id, desired_precision, TOP_K)
 
-	full_res = (
-		service.cse()
-		.list(
-			q=query,
-			cx=search_engine_id,
-	)
-		.execute()
-	)
-	
-	top10_res = full_res["items"][0:11]
-	precision_num = 0
-	
-	for i, res in enumerate(top10_res):
-		print("Result " + str(i + 1))
-		print("[")
-		print("\n ".join(parse_res(res)))
-		print("]\n")
+    # Set the current precision to -1 to indicate that the query has not been executed yet
+    cur_precision = -1
 
-		user_relevance = input("Relevant (Y/N)?")
-		if user_relevance == "Y" or user_relevance == "y":
-			precision_num += 1
+    while True:
+        # Program should terminate if the precision is 0
+        if cur_precision == 0:
+            print("Below desired precision, but can no longer augment the query")
+            print("Terminating ...")
+            break
+        engine.printQueryParams(query)
+        res = engine.getQueryResult(query)
 
-		
-		# TODO: input checking lol
+        # Program should terminate if less than 10 results are returned.
+        if len(res) < 10:
+            print("Less than 10 results returned")
+            print("Terminating ...")
+            break
+        relevant_docs, irrelevant_docs = engine.getRelevanceFeedback(res)
+        cur_precision = engine.computePrecision(len(relevant_docs))
 
-	# pprint.pprint(top10_res)
-	print("================")
-	print("FEEDBACK SUMMARY")
-	print(f"Query '{query}'")
-	print("Precision: " + str(precision_num/10))
+        # Program should terminate if desired precision of query is reached
+        if cur_precision >= desired_precision:
+            engine.printFeedback(query, "", cur_precision)
+            break
+
+        # Else, augment the query and repeat
+        expander = QueryExpander(query, cur_precision, relevant_docs, irrelevant_docs)
+        added_terms, _query = expander.getAddedWords()
+        sorted_query = expander.sortQueryTerms()
+
+        engine.printFeedback(query, added_terms, cur_precision)
+        query = sorted_query
+
 
 if __name__ == "__main__":
-	main()
+    main()
