@@ -8,7 +8,7 @@ import numpy as np
 from nltk.util import everygrams
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from nlp_utils import preprocess, remove_stop_words, tokenize
+from lib.nlp_utils import preprocess, remove_stop_words, tokenize
 
 
 class QueryExpander:

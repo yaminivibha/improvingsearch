@@ -3,7 +3,7 @@
 
 import sys
 from QueryExpander import QueryExpander
-from utils import QueryExecutor
+from QueryExecutor import QueryExecutor
 
 TOP_K = 10
 
@@ -23,7 +23,7 @@ def main():
     desired_precision = float(sys.argv[3])
     query = sys.argv[4]
     
-    exec = QueryExecutor(dev_key, search_engine_id, desired_precision, TOP_K)
+    engine = QueryExecutor(dev_key, search_engine_id, desired_precision, TOP_K)
     
     # Set the current precision to -1 to indicate that the query has not been executed yet
     cur_precision = -1
@@ -34,20 +34,20 @@ def main():
             print("Below desired precision, but can no longer augment the query")
             print("Terminating ...")
             break
-        exec.printQueryParams(query)
-        res = exec.getQueryResult(query)
+        engine.printQueryParams(query)
+        res = engine.getQueryResult(query)
 
         # Program should terminate if less than 10 results are returned.
         if len(res) < 10:
             print("Less than 10 results returned")
             print("Terminating ...")
             break
-        relevant_docs, irrelevant_docs = exec.getRelevanceFeedback(res)
-        cur_precision = exec.computePrecision(len(relevant_docs))
+        relevant_docs, irrelevant_docs = engine.getRelevanceFeedback(res)
+        cur_precision = engine.computePrecision(len(relevant_docs))
 
         # Program should terminate if desired precision of query is reached
         if cur_precision >= desired_precision:
-            exec.printFeedback(query, "", cur_precision)
+            engine.printFeedback(query, "", cur_precision)
             break
 
         # Else, augment the query and repeat
@@ -55,7 +55,7 @@ def main():
         added_terms, _query = expander.getAddedWords()
         sorted_query = expander.sortQueryTerms()
 
-        exec.printFeedback(query, added_terms, cur_precision)
+        engine.printFeedback(query, added_terms, cur_precision)
         query = sorted_query
 
 if __name__ == "__main__":
