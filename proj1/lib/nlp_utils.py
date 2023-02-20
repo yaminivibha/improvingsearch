@@ -2,10 +2,10 @@
 
 from string import punctuation
 from typing import List
+from urllib.parse import urlparse
 
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction import text
-from urllib.parse import urlparse
 
 
 def preprocess(doc: str) -> str:

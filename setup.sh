@@ -8,3 +8,4 @@ pip3 install --upgrade google-api-python-client
 sudo apt-get install python-setuptools python-dev build-essential
 sudo pip install -r requirements.txt
 pip3 install -U scikit-learn
+pip3 install nltk
