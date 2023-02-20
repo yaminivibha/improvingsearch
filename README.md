@@ -1,4 +1,4 @@
-# CS6111 Advanced Databases Project 1
+# CS6111 Advanced Databases Project 1 - Improving Search through Query Expansion
 ###### Yamini Ananth yva2002, Erin Liang ell2147
 Implementation of an information retrieval system that explicitly prompts the user for relevance feedback of search results in order to provide more relevant search results. Project uses the [Google Custom Search API](http://www.cs.columbia.edu/~gravano/cs6111/proj1.html#:~:text=Google%20Custom%20Search%20API%20(https%3A//developers.google.com/custom%2Dsearch/)) for the actual retrieval of results. Our main contribution is implementing the query expansion mechanism, the details of which are in this README.
 
