@@ -48,7 +48,7 @@ def main():
             break
 
         expander = QueryExpander(query, cur_precision, relevant_docs, irrelevant_docs)
-        added_terms = expander.getAddedWords()
+        added_terms, _query = expander.getAddedWords()
         # print(f"expanded query: {query}")
         sorted_query = expander.sortQueryTerms()
 

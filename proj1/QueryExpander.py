@@ -4,7 +4,7 @@ Implements Rocchio's algorithm
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 import numpy as np
 from itertools import permutations
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from nltk.util import everygrams
 from collections import defaultdict
 from nlp_utils import preprocess, tokenize, remove_stop_words
@@ -60,10 +60,10 @@ class QueryExpander:
         Computes the tfidf vectors for the query, relevant docs,
         and irrelevant docs
         """
-        tfidf = TfidfVectorizer(stop_words="english", preprocessor=preprocess)
+        tfidf = TfidfVectorizer(stop_words="english")
         fixed_vocab = tfidf.fit(self.docs).vocabulary_
         tfidf_fixedvocab = TfidfVectorizer(
-            vocabulary=fixed_vocab, stop_words="english", preprocessor=preprocess
+            vocabulary=fixed_vocab, stop_words="english"
         )
 
         vocab_list = tfidf_fixedvocab.get_feature_names_out()
@@ -104,52 +104,55 @@ class QueryExpander:
             processed_rel_docs.append(doc)
         return processed_rel_docs
 
-    def constructNgramCounts(self):
+    def constructNgramCounts(self) -> Dict[Tuple[str, ...], int]:
         """
         Constructs a dictionary of ngram counts for the relevant docs
+        Example: {('sergey', 'brin'): 2, ('sergey', 'brin', 'google'): 1}
         """
-        # we only care bout the bigrams that contain the added words
-        # so we need to extract the bigrams from the relevant docs
-        # and then find the bigrams that contain the added words
+
+        # Extract the bigrams from the relevant docs
+        # Find the bigrams that contain the added words
         processed_rel_docs = self.processRelDocs()
         query = self.updated_query.split()
-        # print(f"query: {query}")
         possible_ngrams = []
 
         # Generate all possible ngrams of length 2 - length of query
         for i in range(2, len(query) + 1):
             possible_ngrams.extend(list(permutations(query, i)))
-        list(everygrams(query))
-        print(f"all possible ngrams of query: {possible_ngrams}")
-        ngram_counts = {k: 0 for k in possible_ngrams}  # TODO: get_ngram_counts()
-        # print(f"ngram_counts: {ngram_counts}")
+        ngram_counts = {k: 0 for k in possible_ngrams}  
 
+        # Count the number of times each ngram appears in the relevant docs
         for i, doc in enumerate(processed_rel_docs):
             doc_ngrams = list(everygrams(doc, max_len=len(query)))
             for ngram in doc_ngrams:
                 if ngram in ngram_counts:
                     ngram_counts[ngram] += 1
 
-        # filter out ngrams count: 0 (not in relevant docs)
+        # Filter out ngrams count: 0 (not in relevant docs)
         ngram_counts = {ngram:count for ngram, count in ngram_counts.items() if count !=0}
         print(f"ngram_counts without 0s: {ngram_counts}")
+        return ngram_counts
 
-        # Sort ngram_counts by decreasing n, then decreasing count
-        def ngram_sort(item: Tuple[Tuple[str], int]) -> Tuple[int]:
+    def sortNgrams(self, ngram_counts) -> List[Tuple[Tuple[str], int]]:
+        """
+        Sorts ngrams by decreasing n, then decreasing count
+        """
+        def sort_key(item: Tuple[Tuple[str], int]) -> Tuple[int]:
+            """Helper function returns sort criteria from ngram_counts"""
             ngram = item[0]
             return len(ngram), item[1]
 
-        sorted_ngram_counts = sorted(ngram_counts.items(), key=ngram_sort, reverse=True)
+        sorted_ngram_counts = sorted(ngram_counts.items(), key=sort_key, reverse=True)
         print(f"sorted_ngram_counts: {sorted_ngram_counts}")
         return sorted_ngram_counts
 
     def sortQueryTerms(self):
         """
-        sorts query terms using bigram counts
+        Sorts query terms using bigram counts
         """
         query = self.updated_query.split()
-        # grab the top n_gram
-        top_ngram = self.constructNgramCounts()[0][0]
+        # Grab the longest, most frequent n_gram that appears in relevant docs
+        top_ngram = self.sortNgrams(self.constructNgramCounts())[0][0]
         sorted_query = " ".join(top_ngram)
         print(f"top ngram: {top_ngram}")
         
@@ -162,8 +165,10 @@ class QueryExpander:
         print(f"sorted query : {sorted_query}")
         
         return sorted_query
-                        
-        # theoretically: could have more n_grams in the expanded query (multiple phrases) but this is enough for a simple query
+
+        #TODO: move into readme!           
+        # theoretically: could have more n_grams in the expanded query 
+        # (multiple phrases) but this is enough for a simple query
 
     def getAddedWords(self) -> str:
         """
@@ -171,25 +176,21 @@ class QueryExpander:
         """
 
         sorted_rocchio_scores = np.argsort(self.rocchio_score).tolist()[0]
-        # print(f"sorted rocchio scores: {sorted_rocchio_scores}")
-        # print(f"rocchio scores shape: {self.rocchio_score.shape}")
 
         added_word_ct = 0
         added_words = []
         for i in range(1, self.query_tfidf.shape[1] + 1):
             term_idx = sorted_rocchio_scores[-i]
             term = self.vocab_list[term_idx]
-            # print(f"{i} th highest tf-idf term: {term} (index {term_idx})")
             if term not in self.query.split():
                 added_words.append(term)
                 added_word_ct += 1
             if added_word_ct == 2:
                 break
         self.added_words = added_words
-        # print(f"added words: {added_words}")
-        return " ".join(added_words)
+        return (" ".join(added_words), " ".join(added_words) + " " + self.query)
 
-
+#TODO: move into readme!
 # ngram_counts:
 # {('tabs',): 6,
 # ('guitar',): 3,
