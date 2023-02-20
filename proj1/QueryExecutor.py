@@ -4,6 +4,7 @@ Helper functions related to query execution, response handling, and input proces
 from googleapiclient.discovery import build
 import regex as re
 from typing import List, Tuple
+from lib.nlp_utils import urlParse
 
 
 class QueryExecutor:
@@ -48,7 +49,9 @@ class QueryExecutor:
     def getQueryResult(self, query: str) -> None:
         """
         Get the top 10 results for a given query from Google Custom Search API
+        Source: https://github.com/googleapis/google-api-python-client/blob/main/samples/customsearch/main.py
         """
+
         full_res = (
             self.googleservice.cse().list(q=query, cx=self.search_engine_id,).execute()
         )
@@ -128,6 +131,5 @@ def parseResults(res: List) -> List[str]:
 
 def combineResults(res: List) -> str:
     # TODO: Parse URL (to get whats between the / / after the .com)
-    # url = res["formattedUrl"]
-
-    return res["title"] + " " + res["snippet"]
+    url_path = urlParse(res["formattedUrl"])
+    return f"{res['title']} {url_path} {res['snippet']}"
