@@ -191,34 +191,4 @@ class QueryExpander:
         # Two-step sort: first by n, then by count
         sorted_ngram_counts = sorted(ngram_counts.items(), key=sort_key, reverse=True)
         return sorted_ngram_counts
-
-
-# TODO: move into readme!
-# ngram_counts:
-# {('tabs',): 6,
-# ('guitar',): 3,
-# ('ultimate',): 1,
-# ('tabs', 'guitar'): 0,
-# ('tabs', 'ultimate'): 0,
-# ('guitar', 'tabs'): 2,
-# ('guitar', 'ultimate'): 0,
-# ('ultimate', 'tabs'): 0,
-# ('ultimate', 'guitar'): 1,
-# ('tabs', 'guitar', 'ultimate'): 0,
-# ('tabs', 'ultimate', 'guitar'): 0,
-# ('guitar', 'tabs', 'ultimate'): 0,
-# ('guitar', 'ultimate', 'tabs'): 0,
-# ('ultimate', 'tabs', 'guitar'): 0,
-# ('ultimate', 'guitar', 'tabs'): 1}
-
-# discard all 1grams (done)
-# discard any ngram with count: 0
-# give more weight to higher n ngrams? but still want to give weight to high counts
-# weighting = count * n
-#
-# Approach 1:
-# Sort by ngram_counts by decreasing n
-# Secondarily sort by n_gram counts
-# grab the top n_gram
-# Whatever words are not in the n_gram, add the words to the end
-# theoretically: could have more n_grams in the expanded query (multiple phrases) but this is enough for a simple query
+    
