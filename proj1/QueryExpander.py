@@ -23,19 +23,19 @@ class QueryExpander:
         irrelevant_docs: List[str],
     ):
         """
-        Parameters:
+        Instance Variables:
         query               = current query terms
         precision           = fraction of retrieved docs that are relevant to the query
         relevant_docs       = list of strings containing relevant docs (unprocessed)
         irrelevant_docs     = list of strings containing irrelevant docs (unprocessed)
-        Instance Variables:
+        docs                = list of strings containing relevant and irrelevant docs (unprocessed)
         vocab_list          = list of strings containing the vocabulary of the corpus, indexes of strings 
                                 correspond to the indexes of the tfidf vectors
         query_tfidf         = tfidf vector of the query
         relevant_tfidf      = tfidf vector of the relevant docs
         irrelevant_tfidf    = tfidf vector of the irrelevant docs
         rocchio_score       = tfidf vector of the expanded query
-        added_words         = *string* containing the words added to the query
+        added_words         = string containing the words added to the query
         updated_query       = string containing the expanded query
         """
 
@@ -92,21 +92,26 @@ class QueryExpander:
         score[score < 0] = 0
         return score
 
-    def sortQueryTerms(self):
+    def processRelDocs(self) -> List[str]:
         """
-        sorts query terms using bigram counts
+        Processes the relevant docs by removing stop words and tokenizing
         """
-
-        # we only care bout the bigrams that contain the added words
-        # so we need to extract the bigrams from the relevant docs
-        # and then find the bigrams that contain the added words
         processed_rel_docs = []
         for doc in self.relevant_docs:
             doc = preprocess(doc)
             doc = tokenize(doc)
             doc = remove_stop_words(doc)
             processed_rel_docs.append(doc)
+        return processed_rel_docs
 
+    def constructNgramCounts(self):
+        """
+        Constructs a dictionary of ngram counts for the relevant docs
+        """
+        # we only care bout the bigrams that contain the added words
+        # so we need to extract the bigrams from the relevant docs
+        # and then find the bigrams that contain the added words
+        processed_rel_docs = self.processRelDocs()
         query = self.updated_query.split()
         # print(f"query: {query}")
         possible_ngrams = []
@@ -119,29 +124,32 @@ class QueryExpander:
         ngram_counts = {k: 0 for k in possible_ngrams}  # TODO: get_ngram_counts()
         # print(f"ngram_counts: {ngram_counts}")
 
-        for doc in processed_rel_docs:
+        for i, doc in enumerate(processed_rel_docs):
             doc_ngrams = list(everygrams(doc, max_len=len(query)))
-            print(f"doc ngrams: {doc_ngrams}")
             for ngram in doc_ngrams:
                 if ngram in ngram_counts:
                     ngram_counts[ngram] += 1
-        print(f"ngram_counts: {ngram_counts}")
 
-        # actual sorting part
-        # get rid of count: 0
+        # filter out ngrams count: 0 (not in relevant docs)
         ngram_counts = {ngram:count for ngram, count in ngram_counts.items() if count !=0}
         print(f"ngram_counts without 0s: {ngram_counts}")
 
-        # Sort by ngram_counts by decreasing n
+        # Sort ngram_counts by decreasing n, then decreasing count
         def ngram_sort(item: Tuple[Tuple[str], int]) -> Tuple[int]:
             ngram = item[0]
             return len(ngram), item[1]
 
         sorted_ngram_counts = sorted(ngram_counts.items(), key=ngram_sort, reverse=True)
-        print(f"sorted_ngram by n: {sorted_ngram_counts}")
+        print(f"sorted_ngram_counts: {sorted_ngram_counts}")
+        return sorted_ngram_counts
 
+    def sortQueryTerms(self):
+        """
+        sorts query terms using bigram counts
+        """
+        query = self.updated_query.split()
         # grab the top n_gram
-        top_ngram = sorted_ngram_counts[0][0]
+        top_ngram = self.constructNgramCounts()[0][0]
         sorted_query = " ".join(top_ngram)
         print(f"top ngram: {top_ngram}")
         
@@ -151,13 +159,13 @@ class QueryExpander:
                 if word not in top_ngram:
                     sorted_query = sorted_query + " " + word
         
-        # print(f"sorted query??  : {sorted_query}")
+        print(f"sorted query : {sorted_query}")
         
         return sorted_query
                         
         # theoretically: could have more n_grams in the expanded query (multiple phrases) but this is enough for a simple query
 
-    def getAddedWords(self) -> Tuple[str, str]:
+    def getAddedWords(self) -> str:
         """
         Returns the modified query vector with additional terms
         """
@@ -179,7 +187,7 @@ class QueryExpander:
                 break
         self.added_words = added_words
         # print(f"added words: {added_words}")
-        return (" ".join(added_words), " ".join(added_words) + " " + self.query)
+        return " ".join(added_words)
 
 
 # ngram_counts:

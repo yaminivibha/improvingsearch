@@ -15,7 +15,7 @@ class QueryExecutor:
         self, dev_key: str, search_engine_id: str, desired_precision: float, top_k: int
     ):
         """
-        Parameters:
+        Instance Variables:
         dev_key             = developer key for Google Custom Search API
         search_engine_id    = search engine ID for Google Custom Search API
         desired_precision   = desired precision of the query
@@ -31,11 +31,6 @@ class QueryExecutor:
         self.desired_precision = desired_precision
         self.top_k = top_k
         self.googleservice = build("customsearch", "v1", developerKey=self.dev_key)
-        # ....
-        # also make relevant docs and irrelevant docs instance vars?
-        # Maybe not because we want to use the same build for every loop right? or that's the lowk goal?
-        # self.relevant_docs = []
-        # self.irrelevant_docs = []
 
     def printQueryParams(self, query: str) -> None:
         """
@@ -86,7 +81,6 @@ class QueryExecutor:
             print(f"Augmenting by {expanded_terms}")
         else:
             print("Desired precision reached, done")
-        return
 
     def getRelevanceFeedback(self, top10_res: List) -> Tuple[List[str], List[str]]:
         """
