@@ -54,8 +54,26 @@ Below are the credentials needed to test the information retrieval system. These
 - [explaining the general structure of your code; what its main high-level components are and what they do]
 - [describing all external libraries that you use in your code]
 ### High-Level Control Flow
-
+- The user inputs (along with the API credentials) a search query and a desired precision (the proportion of the returned results that are relevant).
+- In each round of search, the user annotates 10 documents as relevant or not relevant to the query.
+- If the achieved precision is less than desired, then a new round of search is initiated with an expanded query. Repeated until the desired precision is reached.
+- Notable differences from reference implementation:
+    - More [robust input handling](https://github.com/yaminivibha/improvingsearch/blob/66587f1886b61b76405fffdba661f7a790ddd07e/proj1/QueryExecutor.py#L102-L108):
+        - This program continually re-prompts the user for a “Y”, ”y”, “n”, or ”n”. It does not accept any other input.
+        - In contrast, the reference implementation accepts “Y”, ”y” and classifies any other input as a no.
+    - Expected behavior when there are less than 10 docs returned:
+        - This program terminates elegantly with “Less than 10 results returned, Terminating…”
+        - Reference implementation ends with a `NullPointerError`
+        - We tested this by using a keyboard smash as the query, e.g. “kasjdfaksjdf;kaldf”
+        
 ### High-Level Components
+A code trace for an expected program execution is as follows:
+
+- User inputs the search query and desired precision by invoking main.py
+- A `QueryExecutor` object is created to handle the query execution. It sends the query to Google’s Customized Search Engine (as specified by the Engine ID)
+- The user annotates the top 10 documents retrieved, one-by-one, with relevance feedback
+- The `QueryExecutor` stores the relevant documents and irrelevant documents’ URLs, titles, and snippets as strings and computes the precision of the query. If the precision is as desired or greater, then the program provides feedback summary and terminates. Otherwise, a `QueryExpander` object is initialized with the current query, relevant and irrelevant documents, and current precision.
+- The `QueryExpander` creates tf-idf matrices for all documents and the query and executes Rocchio’s algorithm to augment the query with two additional terms. Then, the augmented query is re-ordered using a term proximity strategy. The program continues expanding the query and iterating until the desired precision is reached.
 
 ### External Packages
 |         Library/Package         | Use case                                                                                                                                                                                                                                    |
