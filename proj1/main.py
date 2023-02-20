@@ -7,6 +7,7 @@ from QueryExecutor import QueryExecutor
 
 TOP_K = 10
 
+
 def main():
     """
     Main function that handles the control flow of the information retrieval system
@@ -22,9 +23,9 @@ def main():
     search_engine_id = sys.argv[2]
     desired_precision = float(sys.argv[3])
     query = sys.argv[4]
-    
+
     engine = QueryExecutor(dev_key, search_engine_id, desired_precision, TOP_K)
-    
+
     # Set the current precision to -1 to indicate that the query has not been executed yet
     cur_precision = -1
 
@@ -57,6 +58,7 @@ def main():
 
         engine.printFeedback(query, added_terms, cur_precision)
         query = sorted_query
+
 
 if __name__ == "__main__":
     main()
