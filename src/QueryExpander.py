@@ -10,6 +10,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 from lib.nlp_utils import processRelDocs
 
+# Empirically set constants for Rocchio's Algorithm
+ALPHA, BETA, GAMMA = 1, 0.75, 0.15
+
 
 class QueryExpander:
     """
@@ -90,9 +93,9 @@ class QueryExpander:
         Calculates the Rocchio score of a given query over the set of retrieved documents
         """
         # Constants set empirically (see README for paper reference)
-        alpha = 1
-        beta = 0.7
-        gamma = 0.15
+        alpha = ALPHA
+        beta = BETA
+        gamma = GAMMA
 
         score = (
             alpha * self.query_tfidf
@@ -191,4 +194,3 @@ class QueryExpander:
         # Two-step sort: first by n, then by count
         sorted_ngram_counts = sorted(ngram_counts.items(), key=sort_key, reverse=True)
         return sorted_ngram_counts
-    

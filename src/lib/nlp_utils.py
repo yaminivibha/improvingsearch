@@ -43,5 +43,5 @@ def urlParse(url: str) -> str:
     url_path = urlparse(url).path
     translator = str.maketrans(
         punctuation, " " * len(punctuation)
-    )  # map punctuation to space
+    )  
     return url_path.translate(translator)
