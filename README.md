@@ -111,9 +111,29 @@ Here, we will give some justifications regarding specific parts of this pre-proc
 
 ### Query Expansion technique
 
+## Credentials For Testing
+Below are the credentials needed to test the information retrieval system. These credentials were generated following [these instructions](http://www.cs.columbia.edu/~gravano/cs6111/proj1.html#:~:text=As%20a%20second%20step%2C%20you%20will%20have%20to%20sign%20up%20for%20the%20Programmable%20Search%20Engine%20service%20(https%3A//programmablesearchengine.google.com/about/)%3A).
 
+- Google Custom Search Engine JSON API Key:
+    
+    ```bash
+    AIzaSyDQTz-AzhWHv-Qbk3ADyPG4hFb3Z6PkLHM 
+    ```
+    
+- Google Engine ID:
+    
+    ```bash
+    45add40315937647f
+    ```
 
-## TODO: Future Work
+## Future Work
+- The field of query expansion is decently well-researched and there were many alternative, more modern query reformulation techniques that we could have implemented.
+- However, many reviewed techniques would have added a good deal of complexity to implement and would have only contributed marginal benefit to our results. Most techniques in literature try to balance multiple evaluation metrics (e.g. precision and recall) or use some sort of extra information about the user (e.g. past query logs) to give more personalized, and thus more relevant results [2]. Given our very specific query setting and scenario for this project—only caring about minimizing the number of iteration that the information retrieval system takes to reach the target precision and having no extra information about the user—many of these techniques would not have adapted well.
+- While testing our system, our query results ironically raised more questions, particularly related to how we should be preprocessing our documents. We experimented with different types of preprocessing `sklearn` and `ntlk` packages to help us implement Rocchio’s algorithm and the query term reordering algorithm. Changing the way the documents were preprocessed yield dramatically different results.
+    - For example, when querying “brin” with the intent of finding information about Sergey Brin, the co-founder of Google, when using the preprocessor that we implemented in `nlp_utils.py` with  `sklearn.TfIdfVectorizer`, Rocchio’s algorithm yielded the additional search terms `sergey page`, as in Larry Page (the other co-founder of Google).
+    - However, when we used the sklearn built-in preprocessor with `sklearn.TfIdfVectorizer`, the output was `sergey google`.
+    - We hypothesize that this is due to the fact that our `nlp_utils.py` preprocessor yields different output text than the builtin `sklearn` function, possibly due to the tokenizer we use in `nlp_utils.py` being `nltk.text.word_tokenizer`. It’s not possible to retrieve the processed documents from `sklearn Vectorizers`, so we could not directly identify the differences between the documents.
+    - In general, considering how document pre-processing affects both query expansion and precision is a robustly interesting region for future work.
 
 ## TODO: References
 
