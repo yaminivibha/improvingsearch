@@ -48,7 +48,9 @@ class QueryExecutor:
     def getQueryResult(self, query: str) -> None:
         """
         Get the top 10 results for a given query from Google Custom Search API
+        Source: https://github.com/googleapis/google-api-python-client/blob/main/samples/customsearch/main.py
         """
+        
         full_res = (
             self.googleservice.cse().list(q=query, cx=self.search_engine_id,).execute()
         )

@@ -14,77 +14,79 @@ Result 1
  Summary: Sergey Mikhailovich Brin is an American business magnate, computer scientist, and internet entrepreneur, who co-founded Google with Larry Page. Brin was the ...
 ]
 
-Relevant (Y/N)?Result 2
+Relevant (Y/N)?y
+Result 2
 [
  URL: https://www.davidbrin.com/
  Title: worlds of David Brin
  Summary: David Brin is best-known for shining light — plausibly and entertainingly — on technology, society, and countless challenges confronting our rambunctious ...
 ]
 
-Relevant (Y/N)?Result 3
+Relevant (Y/N)?n
+Result 3
 [
  URL: https://www.bringlass.com/
  Title: Brin Glass Company: Home
  Summary: Brin's glasswork shines in these Corporate, Healthcare, Education, Hospitality, Residential, Nonprofit, Government, and Retail projects.
 ]
 
-Relevant (Y/N)?Result 4
+Relevant (Y/N)?n
+Result 4
 [
  URL: https://www.postgresql.org/docs/current/brin-intro.html
  Title: Documentation: 15: 71.1. Introduction - PostgreSQL
  Summary: BRIN stands for Block Range Index. BRIN is designed for handling very large tables in which certain columns have some natural correlation with their ...
 ]
 
-Relevant (Y/N)?Result 5
+Relevant (Y/N)?n
+Result 5
 [
  URL: https://www.brinandbrin.com/
  Title: Brin & Brin LLC – Law Firm
  Summary: The litigation, transactional and compliance lawyers at Brin & Brin have proven success in some of the toughest Texas venues. ... We have represented clients in a ...
 ]
 
-Relevant (Y/N)?Result 6
+Relevant (Y/N)?n
+Result 6
 [
  URL: https://en.wiktionary.org/wiki/brin
  Title: brin - Wiktionary
  Summary: NounEdit · One of the radiating sticks of a fan. The outermost are larger and longer, and are called panaches. · A single silkworm thread extruded from the gland, ...
 ]
 
-Relevant (Y/N)?Result 7
+Relevant (Y/N)?n
+Result 7
 [
  URL: https://www.nytimes.com/2023/.../google-chatgpt-artificial-intelligence.html
  Title: Google Calls In Larry Page and Sergey Brin to Tackle ChatGPT and ...
  Summary: Jan 20, 2023 ... Last month, Larry Page and Sergey Brin, Google's founders, held several meetings with company executives. The topic: a rival's new chatbot, ...
 ]
 
-Relevant (Y/N)?Result 8
+Relevant (Y/N)?y
+Result 8
 [
  URL: https://www.forbes.com/profile/sergey-brin/
  Title: Sergey Brin
  Summary: 7 Sergey Brin on the 2022 Forbes 400 - Sergey Brin stepped down as president of Alphabet, parent company of Google, in December 2019 but remains a ...
 ]
 
-Relevant (Y/N)?Result 9
+Relevant (Y/N)?y
+Result 9
 [
  URL: https://www.brinlevinson.com/
  Title: Brin Levinson
  Summary: The Art of Brin Levinson.
 ]
 
-Relevant (Y/N)?Result 10
+Relevant (Y/N)?n
+Result 10
 [
  URL: https://brinsound.bandcamp.com/album/homescreen-glow
  Title: Homescreen Glow | brin
  Summary: Brin is a strand of rhythmic audio expressionism for the online world through the lens of LA-based artist Colin Blanton. Homescreen Glow, the full-length ...
 ]
 
-Relevant (Y/N)?ngram_counts without 0s: {('sergey', 'brin'): 6}
-sorted_ngram_counts: [(('sergey', 'brin'), 6)]
-top ngram: ('sergey', 'brin')
-sorted query : sergey brin google
-ngram_counts without 0s: {('sergey', 'brin'): 6}
-sorted_ngram_counts: [(('sergey', 'brin'), 6)]
-top ngram: ('sergey', 'brin')
-sorted query : sergey brin google
+Relevant (Y/N)?n
 ======================
 FEEDBACK SUMMARY
 Query: brin
@@ -267,14 +269,7 @@ Relevant (Y/N)?Result 10
  Summary: Per se is the phrase to use when you want to refer to a particular thing on its own. It is not this Latin phrase, per se, that is important, but rather the ...
 ]
 
-Relevant (Y/N)?ngram_counts without 0s: {('se', 'new'): 1}
-sorted_ngram_counts: [(('se', 'new'), 1)]
-top ngram: ('se', 'new')
-sorted query : se new michelin per
-ngram_counts without 0s: {('se', 'new'): 1}
-sorted_ngram_counts: [(('se', 'new'), 1)]
-top ngram: ('se', 'new')
-sorted query : se new michelin per
+Relevant (Y/N)?n
 ======================
 FEEDBACK SUMMARY
 Query: per se

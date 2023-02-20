@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# source: https://github.com/googleapis/google-api-python-client/blob/main/samples/customsearch/main.py
 
 import sys
 from QueryExpander import QueryExpander
@@ -8,11 +7,10 @@ from utils import QueryExecutor
 
 TOP_K = 10
 
-
 def main():
-    # Build a service object for interacting with the API. Visit
-    # the Google APIs Console <http://code.google.com/apis/console>
-    # to get an API key for your own application.
+    """
+    Main function that handles the control flow of the information retrieval system
+    """
 
     if len(sys.argv) != 5:
         print(
@@ -24,37 +22,41 @@ def main():
     search_engine_id = sys.argv[2]
     desired_precision = float(sys.argv[3])
     query = sys.argv[4]
+    
     exec = QueryExecutor(dev_key, search_engine_id, desired_precision, TOP_K)
-
+    
+    # Set the current precision to -1 to indicate that the query has not been executed yet
     cur_precision = -1
 
     while True:
+        # Program should terminate if the precision is 0
         if cur_precision == 0:
-            print("Precision of 0. Terminating...")
+            print("Below desired precision, but can no longer augment the query")
+            print("Terminating ...")
             break
         exec.printQueryParams(query)
         res = exec.getQueryResult(query)
 
         # Program should terminate if less than 10 results are returned.
         if len(res) < 10:
-            print("Less than 10 results returned, done")
+            print("Less than 10 results returned")
+            print("Terminating ...")
             break
         relevant_docs, irrelevant_docs = exec.getRelevanceFeedback(res)
         cur_precision = exec.computePrecision(len(relevant_docs))
 
-        # Program should terminate of desired precision of query is reached.
+        # Program should terminate if desired precision of query is reached
         if cur_precision >= desired_precision:
             exec.printFeedback(query, "", cur_precision)
             break
 
+        # Else, augment the query and repeat
         expander = QueryExpander(query, cur_precision, relevant_docs, irrelevant_docs)
         added_terms, _query = expander.getAddedWords()
-        # print(f"expanded query: {query}")
         sorted_query = expander.sortQueryTerms()
 
         exec.printFeedback(query, added_terms, cur_precision)
         query = sorted_query
-
 
 if __name__ == "__main__":
     main()
