@@ -6,7 +6,7 @@ This project was completed as part of the Spring 2023 version of Columbia Univer
 
 ## File Structure
 ~~~
-├── proj1
+├── src
 │   ├── lib
 │   │   ├── nlp_utils.py
 │   ├── main.py
@@ -30,10 +30,10 @@ This project was completed as part of the Spring 2023 version of Columbia Univer
 
 ## How To Run
 1. Navigate to the repository
-```cd <your/path/to/improvingsearch>```
+```cd <your/path/to/proj1>```
 2. Make sure the setup script is executable by changing the file permissions:
 ```chmod +x setup.sh```
-3. From the top level repository, install all the requirements with:
+3. From the top level proj1 repository, install all the requirements with:
 ```bash setup.sh```
 4. Navigate to the src folder:
 ```cd src```
