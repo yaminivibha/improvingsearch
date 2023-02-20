@@ -1,18 +1,23 @@
+"""utils for preprocessing and tokenizing the documents"""
+
+from sklearn.feature_extraction import text
 from string import punctuation
-from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from typing import List
 
-def preprocess(docs):
-    """Preprocesses the documents by removing stopwords and tokenizing"""
-    docs = [docs.lower() for docs in docs]
-    docs = [docs.translate(str.maketrans('', '', punctuation)) for docs in docs]
-    docs = [word_tokenize(docs) for docs in docs]
-    docs = [word for word in docs if word not in stopwords.words('english')]
-    
-    return docs 
 
-# def get_ifidf_for_words(text):
-#     tfidf_matrix= tfidf.transform([text]).todense()
-#     feature_index = tfidf_matrix[0,:].nonzero()[1]
-#     tfidf_scores = zip([feature_names[i] for i in feature_index], [tfidf_matrix[0, x] for x in feature_index])
-#     return dict(tfidf_scores)
+def preprocess(doc: str) -> str:
+    """Preprocesses the documents by lowercasing and removing punctuation"""
+    doc = doc.lower()
+    return doc.translate(str.maketrans("", "", punctuation))
+
+
+def tokenize(doc: str) -> List[str]:
+    """Tokenizes the documents"""
+    return word_tokenize(doc)
+
+
+def remove_stop_words(doc: List[str]) -> List[str]:
+    """Removes stop words from the documents"""
+    stopwords = text.ENGLISH_STOP_WORDS
+    return [word for word in doc if word not in stopwords]

@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 # source: https://github.com/googleapis/google-api-python-client/blob/main/samples/customsearch/main.py
 
-import pprint
 import sys
-import utils
-from expandedQuery import *
+from QueryExpander import QueryExpander
+from utils import QueryExecutor
+
+TOP_K = 10
 
 
 def main():
@@ -23,23 +24,36 @@ def main():
     search_engine_id = sys.argv[2]
     desired_precision = float(sys.argv[3])
     query = sys.argv[4]
+    exec = QueryExecutor(dev_key, search_engine_id, desired_precision, TOP_K)
 
     cur_precision = -1
 
-    # run first iteration to get the current precision:
-    
-    while cur_precision < desired_precision:
+    while True:
         if cur_precision == 0:
             print("Precision of 0. Terminating...")
             break
+        exec.printQueryParams(query)
+        res = exec.getQueryResult(query)
 
-        res = utils.getQueryResult(dev_key, search_engine_id, query, desired_precision)
-        relevant_docs, irrelevant_docs = utils.getRelevanceFeedback(res)
-        expanded_query = ExpandedQuery(
-            query, cur_precision, relevant_docs, irrelevant_docs
-        )
-        expanded_query.getRocchioScore()
-        expanded_query.getModifiedQueryVector()
+        # Program should terminate if less than 10 results are returned.
+        if len(res) < 10:
+            print("Less than 10 results returned, done")
+            break
+        relevant_docs, irrelevant_docs = exec.getRelevanceFeedback(res)
+        cur_precision = exec.computePrecision(len(relevant_docs))
+
+        # Program should terminate of desired precision of query is reached.
+        if cur_precision >= desired_precision:
+            exec.printFeedback(query, "", cur_precision)
+            break
+
+        expander = QueryExpander(query, cur_precision, relevant_docs, irrelevant_docs)
+        added_terms, _query = expander.getAddedWords()
+        # print(f"expanded query: {query}")
+        sorted_query = expander.sortQueryTerms()
+
+        exec.printFeedback(query, added_terms, cur_precision)
+        query = sorted_query
 
 
 if __name__ == "__main__":
